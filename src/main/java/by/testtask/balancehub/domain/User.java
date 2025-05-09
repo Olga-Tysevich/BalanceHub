@@ -6,12 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Set;
 
 import static by.testtask.balancehub.utils.Constants.*;
@@ -22,7 +23,7 @@ import static by.testtask.balancehub.utils.Constants.*;
 @Builder
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userIdSeq")
@@ -43,12 +44,28 @@ public class User {
     @Size(min = 8, max = 500, message = INVALID_PASSWORD_LENGTH)
     private String password;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @CollectionSize(message = EMPTY_PHONE_SET)
     private Set<PhoneData> phones;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @CollectionSize(message = EMPTY_EMAIL_SET)
     private Set<EmailData> emails;
 
+    @Transient
+    private Set<GrantedAuthority> roleSet = Set.of(new SimpleGrantedAuthority("USER"));
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roleSet;
+    }
+
+    @Override
+    public String getUsername() {
+        return name;
+    }
 }

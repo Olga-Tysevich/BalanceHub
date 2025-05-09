@@ -1,6 +1,8 @@
 package by.testtask.balancehub.utils;
 
 public interface Constants {
+    String USER_CLAIM_KEY = "USER_ID";
+
     String DATE_OF_BIRTHDAY_PATTERN = "[yyyy-MM-dd][dd-MM-yyyy][dd.MM.yyyy][yyyy.MM.dd]";
     String REGEXP_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     String REGEXP_PHONE = "^[0-9]{11}$";

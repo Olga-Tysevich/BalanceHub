@@ -14,7 +14,11 @@ import java.util.Set;
 )
 public abstract class UserMapper {
 
+    @Mappings({
+            @Mapping(target = "dateOfBirth", dateFormat = "dd.MM.yyyy")
+    })
     public abstract UserDTO toDto(User user);
+
     @Mappings({
             @Mapping(target = "password", ignore = true)
     })
