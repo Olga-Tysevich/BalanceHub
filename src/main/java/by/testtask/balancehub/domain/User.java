@@ -22,7 +22,7 @@ import static by.testtask.balancehub.utils.Constants.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @Column
@@ -36,7 +36,7 @@ public class User implements UserDetails {
     @Size(max = 500, message = NAME_CANNOT_BE_GZ_500)
     private String name;
 
-    @Column
+    @Column(name = "date_of_birthday")
     @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
     private LocalDate dateOfBirthday;
 

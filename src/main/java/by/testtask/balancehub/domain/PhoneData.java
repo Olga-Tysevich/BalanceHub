@@ -30,7 +30,7 @@ public class PhoneData {
     @NotNull(message = USER_CANNOT_BE_NULL)
     private User user;
 
-    @Column(nullable = false, length = 13, unique = true)
+    @Column(name = "phone_number", nullable = false, length = 13, unique = true)
     @NotBlank(message = PHONE_CANNOT_BE_NULL_OR_EMPTY)
     @Pattern(regexp = REGEXP_PHONE, message = INVALID_PHONE_FORMAT)
     private String phoneNumber;
