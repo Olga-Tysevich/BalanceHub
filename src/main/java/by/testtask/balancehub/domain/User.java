@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -38,7 +37,6 @@ public class User {
 
     @Column
     @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
-    @DateTimeFormat(pattern = DATE_OF_BIRTHDAY_PATTERN)
     private LocalDate dateOfBirthday;
 
     @Column(length = 500)
@@ -51,6 +49,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @CollectionSize(message = EMPTY_EMAIL_SET)
-    private Set<PhoneData> emails;
+    private Set<EmailData> emails;
 
 }

@@ -1,11 +1,12 @@
 package by.testtask.balancehub.utils;
 
 public interface Constants {
-    String DATE_OF_BIRTHDAY_PATTERN = "dd.MM.yyyy";
+    String DATE_OF_BIRTHDAY_PATTERN = "[yyyy-MM-dd][dd-MM-yyyy][dd.MM.yyyy][yyyy.MM.dd]";
     String REGEXP_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     String REGEXP_PHONE = "^[0-9]{11}$";
 
     String ID_CANNOT_BE_NULL = "ID cannot be null!";
+    String USER_ID_CANNOT_BE_NULL = "User id must be specified";
     String USER_CANNOT_BE_NULL = "User must be specified";
     String BALANCE_CANNOT_BE_NULL = "Balance cannot be null";
     String NAME_CANNOT_BE_EMPTY = "Name cannot be null or empty!";
