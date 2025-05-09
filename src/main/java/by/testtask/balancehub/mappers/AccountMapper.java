@@ -2,7 +2,7 @@ package by.testtask.balancehub.mappers;
 
 import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.dto.AccountDTO;
+import by.testtask.balancehub.dto.common.AccountDTO;
 import org.mapstruct.*;
 
 import java.util.Collection;

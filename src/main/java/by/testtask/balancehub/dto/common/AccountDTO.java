@@ -1,4 +1,4 @@
-package by.testtask.balancehub.dto;
+package by.testtask.balancehub.dto.common;
 
 import by.testtask.balancehub.utils.validators.PositiveBalance;
 import jakarta.validation.constraints.NotNull;

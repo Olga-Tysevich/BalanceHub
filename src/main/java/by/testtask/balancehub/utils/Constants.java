@@ -1,6 +1,8 @@
 package by.testtask.balancehub.utils;
 
 public interface Constants {
+    String TOKEN_HEADER = "Authorization";
+    String TOKEN_TYPE = "Bearer";
     String USER_CLAIM_KEY = "USER_ID";
 
     String DATE_OF_BIRTHDAY_PATTERN = "[yyyy-MM-dd][dd-MM-yyyy][dd.MM.yyyy][yyyy.MM.dd]";
@@ -21,5 +23,13 @@ public interface Constants {
     String INVALID_PHONE_FORMAT = "Phone number must be exactly 11 digits. Example: 79207865432";
     String EMPTY_PHONE_SET = "User must have between 1 and 10 phones.";
     String EMPTY_EMAIL_SET = "User must have between 1 and 5 email addresses.";
+    String PASSWORD_CANNOT_BE_NULL_OR_EMPTY = "Password cannot be null or empty!";
+    String PASSWORDS_MISMATCH = "Passwords mismatch!";
+    String ACCESS_DENIED = "Access Denied";
+    String ACCESS_DENIED_MESSAGE = "User do not have permission to access this resource.";
+    String NOT_AUTHORIZED = "Access Denied";
+    String UNKNOWN_USER = "Unknown user";
+    String TOKEN_CANNOT_BE_NULL_OR_EMPTY = "Token cannot be null or empty!";
+    String INVALID_REFRESH_TOKEN = "Invalid refresh token!";
 
 }
