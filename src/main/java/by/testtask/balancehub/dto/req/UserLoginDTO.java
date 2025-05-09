@@ -16,7 +16,7 @@ import static by.testtask.balancehub.utils.Constants.PASSWORD_CANNOT_BE_NULL_OR_
 public class UserLoginDTO {
 
     @NotBlank(message = EMAIL_CANNOT_BE_NULL_OR_EMPTY)
-    private String email;
+    private String emailOrPhone;
 
     @NotBlank(message = PASSWORD_CANNOT_BE_NULL_OR_EMPTY)
     private String password;

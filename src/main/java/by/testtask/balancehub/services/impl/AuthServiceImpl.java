@@ -31,16 +31,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoggedUserDTO loginUser(UserLoginDTO req) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                req.getEmail(),
-                req.getPassword()
-        ));
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(req.getEmailOrPhone(), req.getPassword())
+        );
 
-        User user = (User) userDetailsService.loadUserByUsername(req.getEmail());
-
-        if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
-            throw new PasswordMismatchException();
-        }
+        User user = (User) userDetailsService.loadUserByUsername(req.getEmailOrPhone());
 
         return jwtService.generatePairOfTokens(user);
     }
