@@ -17,7 +17,7 @@ import static by.testtask.balancehub.utils.Constants.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "account")
+@Table(name = "accounts")
 public class Account {
     @Id
     @Column
