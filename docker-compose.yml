@@ -1,0 +1,33 @@
+volumes:
+  pg_balancehub:
+    name: pg_balancehub_db_volume
+    external: false
+
+services:
+  balancehub_db:
+    container_name: ${BALANCE_HUB_DB_NAME}
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${BALANCE_HUB_DB_USER}
+      - POSTGRES_PASSWORD=${BALANCE_HUB_DB_PASSWORD}
+      - POSTGRES_DB=${BALANCE_HUB_DB_NAME}
+    volumes:
+      - pg_tracker:/var/lib/postgresql/data
+
+    ports:
+      - ${BALANCE_HUB_DB_HOST}:${BALANCE_HUB_DB_EPORT}:${BALANCE_HUB_DB_PORT}
+
+  app:
+    restart: always
+    build:
+      context: ${APP_PATH}
+      dockerfile: Dockerfile
+    ports:
+      - ${BALANCE_HUB_APP_EPORT}:${BALANCE_HUB_APP_PORT}
+    depends_on:
+      - balancehub_db
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_APPLICATION_JSON: ${SPRING_APPLICATION_PARAMS}
+      JAVA_OPTS: ${JV_MAX_MEM}
