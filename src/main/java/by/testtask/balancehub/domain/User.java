@@ -57,7 +57,7 @@ public class User implements UserDetails {
     private Set<EmailData> emails;
 
     @Transient
-    private Set<GrantedAuthority> roleSet = Set.of(new SimpleGrantedAuthority("USER"));
+    private final Set<GrantedAuthority> roleSet = Set.of(new SimpleGrantedAuthority("USER"));
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

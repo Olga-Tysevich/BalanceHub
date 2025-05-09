@@ -19,7 +19,7 @@ services:
       - ${BALANCE_HUB_DB_HOST}:${BALANCE_HUB_DB_EPORT}:${BALANCE_HUB_DB_PORT}
 
   app:
-    restart: always
+    restart: no
     build:
       context: ${APP_PATH}
       dockerfile: Dockerfile
