@@ -2,7 +2,7 @@ package by.testtask.balancehub.mappers;
 
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.dto.PhoneDataDTO;
+import by.testtask.balancehub.dto.common.PhoneDataDTO;
 import org.mapstruct.*;
 
 import java.util.Collection;

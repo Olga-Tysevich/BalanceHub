@@ -3,7 +3,7 @@ package by.testtask.balancehub.mappers;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.dto.UserDTO;
+import by.testtask.balancehub.dto.common.UserDTO;
 import org.mapstruct.*;
 
 import java.util.Set;

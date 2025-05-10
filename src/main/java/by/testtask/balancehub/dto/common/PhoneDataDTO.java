@@ -1,4 +1,4 @@
-package by.testtask.balancehub.dto;
+package by.testtask.balancehub.dto.common;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

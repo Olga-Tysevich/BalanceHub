@@ -1,4 +1,4 @@
-package by.testtask.balancehub.dto;
+package by.testtask.balancehub.dto.common;
 
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
