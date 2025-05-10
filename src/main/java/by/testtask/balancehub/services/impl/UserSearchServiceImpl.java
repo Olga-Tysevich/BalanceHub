@@ -5,9 +5,9 @@ import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.services.UserSearchService;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.WildcardQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -37,7 +37,7 @@ public class UserSearchServiceImpl implements UserSearchService {
 
         if (Objects.nonNull(req.getPhone())) queries.addAll(addPhoneQuery(req.getPhone()));
 
-        if (Objects.nonNull(req.getDateOfBirth())) queries.addAll(addDateOfBirthQuery(req.getDateOfBirth()));
+        if (Objects.nonNull(req.getDateOfBirth())) queries.addAll(addDateOfBirthGteQuery(req.getDateOfBirth()));
 
         return createRequest(queries, req.getPage(), req.getSize());
     }
@@ -65,7 +65,7 @@ public class UserSearchServiceImpl implements UserSearchService {
 
     @Override
     public UserPageResp searchByDateOfBirthday(LocalDate dateOfBirth, int page, int size) {
-        List<Query> queries = new ArrayList<>(addDateOfBirthQuery(dateOfBirth));
+        List<Query> queries = new ArrayList<>(addDateOfBirthGtQuery(dateOfBirth));
 
         return createRequest(queries, page, size);
     }
@@ -96,6 +96,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                     .build();
         } catch (IOException e) {
             // TODO лог
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -103,10 +104,12 @@ public class UserSearchServiceImpl implements UserSearchService {
     private List<Query> addNameQuery(String name) {
         List<Query> queries = new ArrayList<>();
 
-        queries.add(MatchQuery.of(m -> m
-                .field("name")
-                .query(name)
-        )._toQuery());
+        queries.add(Query.of(q -> q
+                .matchPhrasePrefix(m -> m
+                        .field("name")
+                        .query(name)
+                )
+        ));
 
         return queries;
     }
@@ -125,14 +128,29 @@ public class UserSearchServiceImpl implements UserSearchService {
     private List<Query> addPhoneQuery(String phone) {
         List<Query> queries = new ArrayList<>();
         queries.add(TermQuery.of(t -> t
-                .field("phones.phoneNumber.keyword")
+                .field("phones.phone.keyword")
                 .value(phone)
         )._toQuery());
 
         return queries;
     }
 
-    private List<Query> addDateOfBirthQuery(LocalDate dateOfBirth) {
+    private List<Query> addDateOfBirthGteQuery(LocalDate dateOfBirth) {
+        List<Query> queries = new ArrayList<>();
+
+        queries.add(Query.of(q -> q
+                .range(r -> r
+                        .date(d -> d
+                                .field("dateOfBirthday")
+                                .gte(dateOfBirth.toString())
+                        )
+                )
+        ));
+
+        return queries;
+    }
+
+    private List<Query> addDateOfBirthGtQuery(LocalDate dateOfBirth) {
         List<Query> queries = new ArrayList<>();
 
         queries.add(Query.of(q -> q

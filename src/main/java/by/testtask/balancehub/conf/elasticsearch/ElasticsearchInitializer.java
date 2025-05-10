@@ -3,6 +3,7 @@ import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.UserRepo;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,7 @@ public class ElasticsearchInitializer {
             elasticsearchClient.indices().create(c -> c
                     .index("users")
                     .mappings(m -> m
+                            .properties("id", p -> p.long_(l -> l))
                             .properties("name", p -> p.text(t -> t))
                             .properties("emails", p -> p.object(o -> o
                                     .properties("id", p2 -> p2.long_(l -> l))
@@ -42,7 +45,7 @@ public class ElasticsearchInitializer {
                             ))
                             .properties("phones", p -> p.object(o -> o
                                     .properties("id", p2 -> p2.long_(l -> l))
-                                    .properties("phoneNumber", p2 -> p2.keyword(k -> k))
+                                    .properties("phone", p2 -> p2.keyword(k -> k))
                             ))
                             .properties("dateOfBirthday", p -> p.date(d -> d))
                     )
@@ -50,28 +53,41 @@ public class ElasticsearchInitializer {
         }
     }
 
+
+    //TODO логи
     private void syncAllUsersToElasticsearch() {
         Set<UserDTO> users = transactionTemplate.execute(status -> getAllUsers());
 
+        if (Objects.isNull(users) || users.isEmpty()) return;
 
         try {
             List<BulkOperation> operations = users.stream()
-                    .map(userDTO -> BulkOperation.of(op -> op
-                            .index(IndexOperation.of(i -> i
-                                    .index("users")
-                                    .id(userDTO.getId().toString())
-                                    .document(userDTO)
-                            ))
-                    ))
+                    .map(userDTO -> {
+                        System.out.println("Синхронизация пользователя: " + userDTO);
+                        return BulkOperation.of(op -> op
+                                .index(IndexOperation.of(i -> i
+                                        .index("users")
+                                        .id(userDTO.getId().toString())
+                                        .document(userDTO)
+                                ))
+                        );
+                    })
                     .toList();
 
-            elasticsearchClient.bulk(b -> b
-                    .index("users")
+            BulkResponse response = elasticsearchClient.bulk(b -> b
                     .operations(operations)
             );
 
-            //TODO логи
-            System.out.println("Синхронизировано пользователей в Elasticsearch: " + users.size());
+            if (response.errors()) {
+                System.err.println("Ошибки при синхронизации пользователей:");
+                response.items().forEach(item -> {
+                    if (item.error() != null) {
+                        System.err.println("Ошибка для ID " + item.id() + ": " + item.error().reason());
+                    }
+                });
+            } else {
+                System.out.println("Синхронизировано пользователей в Elasticsearch: " + users.size());
+            }
         } catch (IOException e) {
             System.err.println("Ошибка синхронизации пользователей в Elasticsearch: " + e.getMessage());
             throw new RuntimeException("Failed to sync users to Elasticsearch", e);

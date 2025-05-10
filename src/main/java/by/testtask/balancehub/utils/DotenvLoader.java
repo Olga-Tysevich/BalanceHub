@@ -27,6 +27,7 @@ public class DotenvLoader {
         System.setProperty("BALANCE_HUB_WEB_ALLOWED_HEADERS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_ALLOWED_HEADERS")));
         System.setProperty("BALANCE_HUB_WEB_IGNORED_URLS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_IGNORED_URLS")));
 
+        System.setProperty("ELASTIC_HOST", Objects.requireNonNull(dotenv.get("ELASTIC_HOST")));
         System.setProperty("ELASTIC_API_PORT", Objects.requireNonNull(dotenv.get("ELASTIC_API_PORT")));
         System.setProperty("ELASTIC_USERNAME", Objects.requireNonNull(dotenv.get("ELASTIC_USERNAME")));
         System.setProperty("ELASTIC_PASSWORD", Objects.requireNonNull(dotenv.get("ELASTIC_PASSWORD")));

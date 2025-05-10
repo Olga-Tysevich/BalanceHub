@@ -1,6 +1,7 @@
 package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.BaseTest;
+import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 
 import static by.testtask.balancehub.utils.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -160,6 +162,11 @@ class UserServiceImplTest extends BaseTest {
 
         assertNotNull(users);
         assertTrue(users.containsKey(UserSearchType.BY_ALL));
+
+        Set<UserDTO> userSet = users.get(UserSearchType.BY_ALL).getUsers();
+
+        assertNotNull(userSet);
+        assertEquals(1, userSet.size());
     }
 
     @Test
@@ -173,6 +180,11 @@ class UserServiceImplTest extends BaseTest {
 
         assertNotNull(users);
         assertTrue(users.containsKey(UserSearchType.BY_NAME));
+
+        Set<UserDTO> userSet = users.get(UserSearchType.BY_NAME).getUsers();
+
+        assertNotNull(userSet);
+        assertEquals(1, userSet.size());
     }
 
     @Test
@@ -186,6 +198,11 @@ class UserServiceImplTest extends BaseTest {
 
         assertNotNull(users);
         assertTrue(users.containsKey(UserSearchType.BY_EMAIL));
+
+        Set<UserDTO> userSet = users.get(UserSearchType.BY_EMAIL).getUsers();
+
+        assertNotNull(userSet);
+        assertEquals(1, userSet.size());
     }
 
     @Test
@@ -199,6 +216,11 @@ class UserServiceImplTest extends BaseTest {
 
         assertNotNull(users);
         assertTrue(users.containsKey(UserSearchType.BY_PHONE));
+
+        Set<UserDTO> userSet = users.get(UserSearchType.BY_PHONE).getUsers();
+
+        assertNotNull(userSet);
+        assertEquals(1, userSet.size());
     }
 
     @Test
@@ -212,5 +234,10 @@ class UserServiceImplTest extends BaseTest {
 
         assertNotNull(users);
         assertTrue(users.containsKey(UserSearchType.BY_BIRTHDAY));
+
+        Set<UserDTO> userSet = users.get(UserSearchType.BY_BIRTHDAY).getUsers();
+
+        assertNotNull(userSet);
+        assertEquals(1, userSet.size());
     }
 }

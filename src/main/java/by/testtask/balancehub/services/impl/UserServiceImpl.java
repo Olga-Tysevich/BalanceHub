@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (request.searchByEmail()) {
-            users.put(UserSearchType.BY_EMAIL, userSearchService.searchByEmail(request.getName(), request.getPage(), request.getSize()));
+            users.put(UserSearchType.BY_EMAIL, userSearchService.searchByEmail(request.getEmail(), request.getPage(), request.getSize()));
         }
 
         if (request.searchByPhone()) {
