@@ -1,6 +1,6 @@
-package by.testtask.balancehub.services.impl;
+package by.testtask.balancehub;
 
-import by.testtask.balancehub.services.impl.utils.PostgresSQL;
+import by.testtask.balancehub.utils.PostgresSQL;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

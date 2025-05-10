@@ -1,4 +1,4 @@
-package by.testtask.balancehub.services.impl.utils;
+package by.testtask.balancehub.utils;
 
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
