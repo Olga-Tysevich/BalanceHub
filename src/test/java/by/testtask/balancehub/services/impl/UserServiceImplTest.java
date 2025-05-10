@@ -5,26 +5,31 @@ import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.exceptions.EmailAlreadyInUse;
-import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.services.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 import static by.testtask.balancehub.utils.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class UserServiceImplTest extends BaseTest {
 
     @Autowired
     private UserService userService;
 
+    @BeforeEach
+    void setUp() {
+        setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
+    }
+
     @Test
     void addEmail_success() {
-        String email = USERNAME_1_EMAIL.getFirst();
+        String email = "mynewemail@gmail.com";
 
         Long userId = userService.addEmail(email);
 
@@ -34,16 +39,14 @@ class UserServiceImplTest extends BaseTest {
 
     @Test
     void addEmail_alreadyInUse_fails() {
-        String email = USERNAME_1_EMAIL.getFirst();
-
-        when(userService.addEmail(email)).thenThrow(new EmailAlreadyInUse(email));
+        String email = USERNAME_1_EMAIL_LIST.getFirst();
 
         assertThrows(EmailAlreadyInUse.class, () -> userService.addEmail(email));
     }
 
     @Test
     void addPhone_success() {
-        String phone = USERNAME_1_PHONE.getFirst();
+        String phone = "79201111111";
 
         Long userId = userService.addPhone(phone);
 
@@ -53,91 +56,102 @@ class UserServiceImplTest extends BaseTest {
 
     @Test
     void addPhone_alreadyInUse_fails() {
-        String phone = USERNAME_1_PHONE.getFirst();
-
-        when(userService.addPhone(phone)).thenThrow(new EmailAlreadyInUse(phone));
+        String phone = USERNAME_1_PHONE_LIST.getFirst();
 
         assertThrows(EmailAlreadyInUse.class, () -> userService.addPhone(phone));
     }
 
     @Test
     void changeEmail_success() {
-        Long oldEmailId = 1L;
+        Long oldEmailId = 5L;
+
+        setAuthentication(USERNAME_3_EMAIL_LIST.getFirst(), USERNAME_3_PASSWORD);
+
         String newEmail = "newemail@example.com";
 
         Long userId = userService.changeEmail(oldEmailId, newEmail);
 
         assertNotNull(userId);
-        assertEquals(USERNAME_1_ID, userId);
+        assertEquals(USERNAME_3_ID, userId);
     }
 
     @Test
     void changeEmail_emailInUse_fails() {
         Long oldEmailId = 1L;
-        String newEmail = USERNAME_2_EMAIL.getFirst();
+        String newEmail = USERNAME_2_EMAIL_LIST.getFirst();
 
         assertThrows(EmailAlreadyInUse.class, () -> userService.changeEmail(oldEmailId, newEmail));
     }
 
     @Test
     void changePhone_success() {
-        Long oldPhoneId = 1L;
+        Long oldPhoneId = 5L;
         String newPhone = "79201111110";
+
+        setAuthentication(USERNAME_3_EMAIL_LIST.getFirst(), USERNAME_3_PASSWORD);
 
         Long userId = userService.changePhone(oldPhoneId, newPhone);
 
         assertNotNull(userId);
-        assertEquals(USERNAME_1_ID, userId);
+        assertEquals(USERNAME_3_ID, userId);
     }
 
     @Test
     void changePhone_phoneInUse_fails() {
         Long oldPhoneId = 1L;
-        String newPhone = USERNAME_2_PHONE.getFirst();
+        String newPhone = USERNAME_2_PHONE_LIST.getFirst();
 
         assertThrows(EmailAlreadyInUse.class, () -> userService.changePhone(oldPhoneId, newPhone));
     }
 
     @Test
     void deleteEmail_success() {
-        Long emailId = 1L;
+        Long emailId = 8L;
+
+        setAuthentication(USERNAME_4_EMAIL_LIST.getFirst(), USERNAME_4_PASSWORD);
 
         Long userId = userService.deleteEmail(emailId);
 
         assertNotNull(userId);
-        assertEquals(USERNAME_1_ID, userId);
+        assertEquals(USERNAME_4_ID, userId);
     }
 
     @Test
     void deleteEmail_notAuthorized_fails() {
         Long emailId = 1L;
 
-        assertThrows(UnauthorizedException.class, () -> userService.deleteEmail(emailId));
+        clearAuthentication();
+
+        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> userService.deleteEmail(emailId));
     }
 
     @Test
     void deletePhone_success() {
-        Long phoneId = 1L;
+        setAuthentication(USERNAME_4_PHONE_LIST.getFirst(), USERNAME_4_PASSWORD);
+
+        Long phoneId = 8L;
 
         Long userId = userService.deletePhone(phoneId);
 
         assertNotNull(userId);
-        assertEquals(USERNAME_1_ID, userId);
+        assertEquals(USERNAME_4_ID, userId);
     }
 
     @Test
     void deletePhone_notAuthorized_fails() {
         Long phoneId = 1L;
 
-        assertThrows(UnauthorizedException.class, () -> userService.deletePhone(phoneId));
+        clearAuthentication();
+
+        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> userService.deletePhone(phoneId));
     }
 
     @Test
     void find_usersByAllParams_success() {
         UserSearchReq request = new UserSearchReq();
         request.setName(USERNAME_1);
-        request.setPhone(USERNAME_1_PHONE.getFirst());
-        request.setEmail(USERNAME_1_EMAIL.getFirst());
+        request.setPhone(USERNAME_1_PHONE_LIST.getFirst());
+        request.setEmail(USERNAME_1_EMAIL_LIST.getFirst());
         request.setDateOfBirth(LocalDate.parse(USERNAME_1_DATE_OF_BIRTHDAY));
         request.setPage(0);
         request.setSize(10);
@@ -166,7 +180,7 @@ class UserServiceImplTest extends BaseTest {
         UserSearchReq request = new UserSearchReq();
         request.setPage(0);
         request.setSize(10);
-        request.setName(USERNAME_1_EMAIL.getFirst());
+        request.setName(USERNAME_1_EMAIL_LIST.getFirst());
 
         Map<UserSearchType, UserPageResp> users = userService.find(request);
 
@@ -179,7 +193,7 @@ class UserServiceImplTest extends BaseTest {
         UserSearchReq request = new UserSearchReq();
         request.setPage(0);
         request.setSize(10);
-        request.setPhone(USERNAME_1_PHONE.getFirst());
+        request.setPhone(USERNAME_1_PHONE_LIST.getFirst());
 
         Map<UserSearchType, UserPageResp> users = userService.find(request);
 

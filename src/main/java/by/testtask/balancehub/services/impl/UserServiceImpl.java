@@ -3,12 +3,14 @@ package by.testtask.balancehub.services.impl;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
+import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
 import by.testtask.balancehub.exceptions.EmailAlreadyInUse;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
+import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.EmailDataRepo;
 import by.testtask.balancehub.repos.PhoneDataRepo;
 import by.testtask.balancehub.services.UserSearchService;
@@ -26,12 +28,13 @@ import java.util.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class UserServiceImpl implements UserService {
     private final EmailDataRepo emailDataRepo;
     private final PhoneDataRepo phoneDataRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final UserSearchService userSearchService;
+    private final UserMapper userMapper;
 
     @Override
     public Long addEmail(String email) {
@@ -80,7 +83,7 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!emailDataRepo.existsByIdAndUserId(emailId, userId))
-            throw new AccessDeniedException("The current user is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
+            throw new AccessDeniedException("The current dto is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
 
         emailDataRepo.deleteById(emailId);
         publishEvent();
@@ -120,7 +123,7 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!phoneDataRepo.existsByIdAndUserId(phoneId, userId))
-            throw new AccessDeniedException("The current user is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
+            throw new AccessDeniedException("The current dto is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
 
         phoneDataRepo.deleteById(phoneId);
         publishEvent();
@@ -131,6 +134,9 @@ public class UserServiceImpl implements UserService {
     private EmailData createEmail(String email) {
         User currentUser = PrincipalExtractor.getCurrentUser();
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
+
+        if (currentUser.isContainsEmail(email))
+            throw new EmailAlreadyInUse(email, "Email has already been added for the current user with id: " + currentUser.getId());
 
         Long currentUserId = currentUser.getId();
 
@@ -146,6 +152,10 @@ public class UserServiceImpl implements UserService {
         User currentUser = PrincipalExtractor.getCurrentUser();
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
 
+        if (currentUser.isContainsPhone(phone))
+            throw new EmailAlreadyInUse(phone, "Phone has already been added for the current with id: " + currentUser.getId());
+
+
         Long currentUserId = currentUser.getId();
 
         if (phoneDataRepo.existsByPhoneNumberAndUserIdNot(phone, currentUserId)) throw new EmailAlreadyInUse(phone);
@@ -158,7 +168,12 @@ public class UserServiceImpl implements UserService {
 
     private void publishEvent() {
         User currentUser = PrincipalExtractor.getCurrentUser();
-        eventPublisher.publishEvent(new Events.UserChangedEvent(currentUser));
+
+        if (Objects.isNull(currentUser)) throw new UnauthorizedException();
+
+        UserDTO userDTO = userMapper.toDto(currentUser);
+
+        eventPublisher.publishEvent(new Events.UserChangedEvent(userDTO));
     }
 
 }

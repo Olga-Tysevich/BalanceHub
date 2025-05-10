@@ -36,8 +36,14 @@ public class ElasticsearchInitializer {
                     .index("users")
                     .mappings(m -> m
                             .properties("name", p -> p.text(t -> t))
-                            .properties("emails", p -> p.keyword(k -> k))
-                            .properties("phones", p -> p.keyword(k -> k))
+                            .properties("emails", p -> p.object(o -> o
+                                    .properties("id", p2 -> p2.long_(l -> l))
+                                    .properties("email", p2 -> p2.keyword(k -> k))
+                            ))
+                            .properties("phones", p -> p.object(o -> o
+                                    .properties("id", p2 -> p2.long_(l -> l))
+                                    .properties("phoneNumber", p2 -> p2.keyword(k -> k))
+                            ))
                             .properties("dateOfBirthday", p -> p.date(d -> d))
                     )
             );
@@ -50,11 +56,11 @@ public class ElasticsearchInitializer {
 
         try {
             List<BulkOperation> operations = users.stream()
-                    .map(user -> BulkOperation.of(op -> op
+                    .map(userDTO -> BulkOperation.of(op -> op
                             .index(IndexOperation.of(i -> i
                                     .index("users")
-                                    .id(user.getId().toString())
-                                    .document(user)
+                                    .id(userDTO.getId().toString())
+                                    .document(userDTO)
                             ))
                     ))
                     .toList();

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class UserSearchServiceImpl implements UserSearchService {
     private final ElasticsearchClient elasticsearchClient;
 

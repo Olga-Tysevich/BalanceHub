@@ -2,7 +2,6 @@ package by.testtask.balancehub.events.listeners;
 
 import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.events.Events;
-import by.testtask.balancehub.mappers.UserMapper;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -14,11 +13,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class UserChangedEventListener {
     private final ElasticsearchClient elasticsearchClient;
-    private final UserMapper userMapper;
 
     @EventListener
     public void onUserChanged(Events.UserChangedEvent event) {
-        UserDTO dto = userMapper.toDto(event.user());
+        UserDTO dto = event.dto();
 
         try {
             elasticsearchClient.index(i -> i
@@ -27,7 +25,7 @@ public class UserChangedEventListener {
                     .document(dto));
         } catch (IOException e) {
             // TODO логи
-            throw new RuntimeException("Failed to index user in Elasticsearch", e);
+            throw new RuntimeException("Failed to index dto in Elasticsearch", e);
         }
     }
 }
