@@ -6,8 +6,6 @@ import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.services.UserSearchService;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.WildcardQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -80,6 +78,7 @@ public class UserSearchServiceImpl implements UserSearchService {
 
         try {
             SearchResponse<UserDTO> response = elasticsearchClient.search(searchRequest, UserDTO.class);
+            System.out.println("Total hits: " + response.hits().total().value());
 
             Set<UserDTO> users = response.hits().hits().stream()
                     .map(Hit::source)
@@ -115,23 +114,34 @@ public class UserSearchServiceImpl implements UserSearchService {
     }
 
     private List<Query> addEmailQuery(String email) {
-
         List<Query> queries = new ArrayList<>();
-        queries.add(TermQuery.of(t -> t
-                .field("emails.email.keyword") // ".keyword" для точного совпадения
-                .value(email)
-        )._toQuery());
-
+        queries.add(Query.of(q -> q
+                .nested(n -> n
+                        .path("emails")
+                        .query(q2 -> q2
+                                .term(t -> t
+                                        .field("emails.email.keyword")
+                                        .value(email)
+                                )
+                        )
+                )
+        ));
         return queries;
     }
 
     private List<Query> addPhoneQuery(String phone) {
         List<Query> queries = new ArrayList<>();
-        queries.add(TermQuery.of(t -> t
-                .field("phones.phone.keyword")
-                .value(phone)
-        )._toQuery());
-
+        queries.add(Query.of(q -> q
+                .nested(n -> n
+                        .path("phones")
+                        .query(q2 -> q2
+                                .term(t -> t
+                                        .field("phones.phone.keyword")
+                                        .value(phone)
+                                )
+                        )
+                )
+        ));
         return queries;
     }
 

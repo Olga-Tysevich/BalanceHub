@@ -39,11 +39,11 @@ public class ElasticsearchInitializer {
                     .mappings(m -> m
                             .properties("id", p -> p.long_(l -> l))
                             .properties("name", p -> p.text(t -> t))
-                            .properties("emails", p -> p.object(o -> o
+                            .properties("emails", p -> p.nested(n -> n
                                     .properties("id", p2 -> p2.long_(l -> l))
                                     .properties("email", p2 -> p2.keyword(k -> k))
                             ))
-                            .properties("phones", p -> p.object(o -> o
+                            .properties("phones", p -> p.nested(n -> n
                                     .properties("id", p2 -> p2.long_(l -> l))
                                     .properties("phone", p2 -> p2.keyword(k -> k))
                             ))

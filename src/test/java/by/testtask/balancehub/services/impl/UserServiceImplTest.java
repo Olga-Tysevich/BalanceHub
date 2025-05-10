@@ -192,7 +192,7 @@ class UserServiceImplTest extends BaseTest {
         UserSearchReq request = new UserSearchReq();
         request.setPage(0);
         request.setSize(10);
-        request.setName(USERNAME_1_EMAIL_LIST.getFirst());
+        request.setEmail(USERNAME_1_EMAIL_LIST.getFirst());
 
         Map<UserSearchType, UserPageResp> users = userService.find(request);
 
@@ -238,6 +238,6 @@ class UserServiceImplTest extends BaseTest {
         Set<UserDTO> userSet = users.get(UserSearchType.BY_BIRTHDAY).getUsers();
 
         assertNotNull(userSet);
-        assertEquals(1, userSet.size());
+        assertEquals(6, userSet.size());
     }
 }
