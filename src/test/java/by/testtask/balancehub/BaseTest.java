@@ -1,5 +1,6 @@
 package by.testtask.balancehub;
 
+import by.testtask.balancehub.utils.Elasticsearch;
 import by.testtask.balancehub.utils.PostgresSQL;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ public abstract class BaseTest {
     @BeforeAll
     static void initTestContainer() {
         PostgresSQL.container.start();
+        Elasticsearch.container.start();
     }
 
 }

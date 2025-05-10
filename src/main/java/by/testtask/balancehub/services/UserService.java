@@ -1,6 +1,6 @@
 package by.testtask.balancehub.services;
 
-import by.testtask.balancehub.dto.common.SearchType;
+import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import jakarta.validation.constraints.NotBlank;
@@ -27,5 +27,5 @@ public interface UserService {
 
     Long deletePhone(@NotNull Long phoneId);
 
-    Map<SearchType, UserPageResp> find(@NotNull UserSearchReq request);
+    Map<UserSearchType, UserPageResp> find(@NotNull UserSearchReq request);
 }

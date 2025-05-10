@@ -3,7 +3,7 @@ package by.testtask.balancehub.services.impl;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.dto.common.SearchType;
+import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
@@ -89,27 +89,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<SearchType, UserPageResp> find(UserSearchReq request) {
-        Map<SearchType, UserPageResp> users = new HashMap<>();
+    public Map<UserSearchType, UserPageResp> find(UserSearchReq request) {
+        Map<UserSearchType, UserPageResp> users = new HashMap<>();
 
         if (request.searchByAllParams()) {
-            users.put(SearchType.BY_ALL, userSearchService.searchByAll(request));
+            users.put(UserSearchType.BY_ALL, userSearchService.searchByAll(request));
         }
 
         if (request.searchByName()) {
-            users.put(SearchType.BY_NAME, userSearchService.searchByName(request.getName(), request.getPage(), request.getSize()));
+            users.put(UserSearchType.BY_NAME, userSearchService.searchByName(request.getName(), request.getPage(), request.getSize()));
         }
 
         if (request.searchByEmail()) {
-            users.put(SearchType.BY_EMAIL, userSearchService.searchByEmail(request.getName(), request.getPage(), request.getSize()));
+            users.put(UserSearchType.BY_EMAIL, userSearchService.searchByEmail(request.getName(), request.getPage(), request.getSize()));
         }
 
         if (request.searchByPhone()) {
-            users.put(SearchType.BY_PHONE, userSearchService.searchByPhone(request.getPhone(), request.getPage(), request.getSize()));
+            users.put(UserSearchType.BY_PHONE, userSearchService.searchByPhone(request.getPhone(), request.getPage(), request.getSize()));
         }
 
         if (request.searchByDateOfBirth()) {
-            users.put(SearchType.BY_BIRTHDAY, userSearchService.searchByDateOfBirthday(request.getDateOfBirth(), request.getPage(), request.getSize()));
+            users.put(UserSearchType.BY_BIRTHDAY, userSearchService.searchByDateOfBirthday(request.getDateOfBirth(), request.getPage(), request.getSize()));
         }
 
         return users;

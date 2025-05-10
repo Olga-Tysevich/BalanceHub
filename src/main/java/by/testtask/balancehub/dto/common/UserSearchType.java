@@ -1,6 +1,6 @@
 package by.testtask.balancehub.dto.common;
 
-public enum SearchType {
+public enum UserSearchType {
     BY_NAME,
     BY_EMAIL,
     BY_PHONE,
