@@ -1,7 +1,11 @@
 package by.testtask.balancehub.services;
 
+import by.testtask.balancehub.dto.common.UserDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.Set;
+
 /**
  * Service interface for managing user's contact information such as emails and phone numbers.
  * <p>
@@ -21,4 +25,5 @@ public interface UserService {
 
     Long deletePhone(@NotNull Long phoneId);
 
+    Set<UserDTO> getAllUsers();
 }
