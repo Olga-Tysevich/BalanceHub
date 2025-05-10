@@ -3,14 +3,15 @@ package by.testtask.balancehub.services.impl;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.dto.common.UserDTO;
+import by.testtask.balancehub.dto.common.SearchType;
+import by.testtask.balancehub.dto.req.UserSearchReq;
+import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
 import by.testtask.balancehub.exceptions.EmailAlreadyInUse;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
-import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.EmailDataRepo;
 import by.testtask.balancehub.repos.PhoneDataRepo;
-import by.testtask.balancehub.repos.UserRepo;
+import by.testtask.balancehub.services.UserSearchService;
 import by.testtask.balancehub.services.UserService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +21,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
 public class UserServiceImpl implements UserService {
-    private final UserRepo userRepo;
     private final EmailDataRepo emailDataRepo;
     private final PhoneDataRepo phoneDataRepo;
     private final ApplicationEventPublisher eventPublisher;
-    private final UserMapper userMapper;
+    private final UserSearchService userSearchService;
 
     @Override
     public Long addEmail(String email) {
@@ -91,6 +89,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Map<SearchType, UserPageResp> find(UserSearchReq request) {
+        Map<SearchType, UserPageResp> users = new HashMap<>();
+
+        if (request.searchByAllParams()) {
+            users.put(SearchType.BY_ALL, userSearchService.searchByAll(request));
+        }
+
+        if (request.searchByName()) {
+            users.put(SearchType.BY_NAME, userSearchService.searchByName(request.getName(), request.getPage(), request.getSize()));
+        }
+
+        if (request.searchByEmail()) {
+            users.put(SearchType.BY_EMAIL, userSearchService.searchByEmail(request.getName(), request.getPage(), request.getSize()));
+        }
+
+        if (request.searchByPhone()) {
+            users.put(SearchType.BY_PHONE, userSearchService.searchByPhone(request.getPhone(), request.getPage(), request.getSize()));
+        }
+
+        if (request.searchByDateOfBirth()) {
+            users.put(SearchType.BY_BIRTHDAY, userSearchService.searchByDateOfBirthday(request.getDateOfBirth(), request.getPage(), request.getSize()));
+        }
+
+        return users;
+    }
+
+    @Override
     public Long deletePhone(Long phoneId) {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
@@ -101,13 +126,6 @@ public class UserServiceImpl implements UserService {
         publishEvent();
 
         return userId;
-    }
-
-    @Override
-    public Set<UserDTO> getAllUsers() {
-        return userRepo.findAll().stream()
-                .map(userMapper::toDto)
-                .collect(Collectors.toSet());
     }
 
     private EmailData createEmail(String email) {

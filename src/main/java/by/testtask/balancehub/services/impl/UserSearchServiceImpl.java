@@ -1,6 +1,8 @@
 package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.dto.common.UserDTO;
+import by.testtask.balancehub.dto.req.UserSearchReq;
+import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.services.UserSearchService;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
@@ -10,6 +12,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,49 +20,57 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 public class UserSearchServiceImpl implements UserSearchService {
     private final ElasticsearchClient elasticsearchClient;
 
     @Override
-    public List<UserDTO> searchByAll(String name, String email, String phone,
-                                     LocalDate dateOfBirth, int page, int size) throws IOException {
+    public UserPageResp searchByAll(UserSearchReq req) {
         List<Query> queries = new ArrayList<>();
 
-        if (Objects.nonNull(name)) queries.addAll(addNameQuery(name));
+        if (Objects.nonNull(req.getName())) queries.addAll(addNameQuery(req.getName()));
 
-        if (Objects.nonNull(phone)) queries.addAll(addPhoneQuery(phone));
+        if (Objects.nonNull(req.getPhone())) queries.addAll(addPhoneQuery(req.getPhone()));
 
-        if (Objects.nonNull(dateOfBirth)) queries.addAll(addDateOfBirthQuery(dateOfBirth));
+        if (Objects.nonNull(req.getDateOfBirth())) queries.addAll(addDateOfBirthQuery(req.getDateOfBirth()));
 
-        return createRequest(queries, page, size);
+        return createRequest(queries, req.getPage(), req.getSize());
     }
 
     @Override
-    public List<UserDTO> searchByName(String name, int page, int size) throws IOException {
+    public UserPageResp searchByName(String name, int page, int size) {
         List<Query> queries = new ArrayList<>(addNameQuery(name));
 
         return createRequest(queries, page, size);
     }
 
     @Override
-    public List<UserDTO> searchByEmail(String email, int page, int size) throws IOException {
+    public UserPageResp searchByEmail(String email, int page, int size) {
         List<Query> queries = new ArrayList<>(addEmailQuery(email));
 
         return createRequest(queries, page, size);
     }
 
     @Override
-    public List<UserDTO> searchByDateOfBirthday(LocalDate dateOfBirth, int page, int size) throws IOException {
+    public UserPageResp searchByPhone(String phone, int page, int size) {
+        List<Query> queries = new ArrayList<>(addPhoneQuery(phone));
+
+        return createRequest(queries, page, size);
+    }
+
+    @Override
+    public UserPageResp searchByDateOfBirthday(LocalDate dateOfBirth, int page, int size) {
         List<Query> queries = new ArrayList<>(addDateOfBirthQuery(dateOfBirth));
 
         return createRequest(queries, page, size);
     }
 
-    private List<UserDTO> createRequest(List<Query> queries, Integer page, Integer size) throws IOException {
+    private UserPageResp createRequest(List<Query> queries, int page, int size) {
         SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index("users")
                 .query(q -> q.bool(b -> b.must(queries)))
@@ -67,11 +78,26 @@ public class UserSearchServiceImpl implements UserSearchService {
                 .size(size)
         );
 
-        SearchResponse<UserDTO> response = elasticsearchClient.search(searchRequest, UserDTO.class);
+        try {
+            SearchResponse<UserDTO> response = elasticsearchClient.search(searchRequest, UserDTO.class);
 
-        return response.hits().hits().stream()
-                .map(Hit::source)
-                .collect(Collectors.toList());
+            Set<UserDTO> users = response.hits().hits().stream()
+                    .map(Hit::source)
+                    .collect(Collectors.toSet());
+
+            int totalHits = Objects.nonNull(response.hits().total()) ? (int) response.hits().total().value() : 0;
+            int totalPages = (int) Math.ceil((double) totalHits / size);
+
+            return UserPageResp.builder()
+                    .users(users)
+                    .page(page)
+                    .totalPages(totalPages)
+                    .totalUsers(totalHits)
+                    .build();
+        } catch (IOException e) {
+            // TODO лог
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Query> addNameQuery(String name) {

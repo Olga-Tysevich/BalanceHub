@@ -1,21 +1,21 @@
 package by.testtask.balancehub.services;
 
-import by.testtask.balancehub.dto.common.UserDTO;
+import by.testtask.balancehub.dto.req.UserSearchReq;
+import by.testtask.balancehub.dto.resp.UserPageResp;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 
 public interface UserSearchService {
 
-    List<UserDTO> searchByAll(String name, String email, String phone, LocalDate dateOfBirth, int page, int size) throws IOException;
+    UserPageResp searchByAll(UserSearchReq req);
 
-    List<UserDTO> searchByName(@NotBlank String name, int page, int size) throws IOException;
+    UserPageResp searchByName(@NotBlank String name, int page, int size);
 
-    List<UserDTO> searchByEmail(@NotBlank String email, int page, int size) throws IOException;
+    UserPageResp searchByEmail(@NotBlank String email, int page, int size);
+    UserPageResp searchByPhone(@NotBlank String phone, int page, int size);
 
-    List<UserDTO> searchByDateOfBirthday(@NotNull LocalDate dateOfBirth, int page, int size) throws IOException;
+    UserPageResp searchByDateOfBirthday(@NotNull LocalDate dateOfBirth, int page, int size);
 
 }
