@@ -2,7 +2,7 @@ package by.testtask.balancehub.utils;
 
 import java.util.List;
 
-public interface Constants {
+public interface TestConstants {
     String USERNAME_1 = "Alice Johnson";
     String USERNAME_2 = "Bob Smith";
     String USERNAME_3 = "Charlie Brown";

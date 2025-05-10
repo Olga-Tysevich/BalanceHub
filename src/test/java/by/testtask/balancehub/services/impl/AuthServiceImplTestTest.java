@@ -7,6 +7,7 @@ import by.testtask.balancehub.services.AuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static by.testtask.balancehub.utils.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthServiceImplTestTest extends BaseTest {
