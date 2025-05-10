@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -35,7 +34,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
-    private final AntPathMatcher pathMatcher;
 
     @Value("${spring.app.web.ignoredUrls:*}")
     private List<String> ignoredUrls;
@@ -43,7 +41,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return ignoredUrls.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
+        return ignoredUrls.stream().anyMatch(path::matches);
     }
 
     @Override

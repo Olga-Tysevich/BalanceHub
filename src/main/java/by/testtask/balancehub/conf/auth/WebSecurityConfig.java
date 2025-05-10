@@ -1,4 +1,5 @@
 package by.testtask.balancehub.conf.auth;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -66,7 +66,7 @@ public class WebSecurityConfig {
         return httpSecurity.build();
     }
 
-       @Bean
+    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
@@ -94,10 +94,4 @@ public class WebSecurityConfig {
     public ForbiddenEntryPoint entryPoint() {
         return new ForbiddenEntryPoint();
     }
-
-    @Bean
-    public AntPathMatcher antPathMatcher() {
-        return new AntPathMatcher();
-    }
-
 }
