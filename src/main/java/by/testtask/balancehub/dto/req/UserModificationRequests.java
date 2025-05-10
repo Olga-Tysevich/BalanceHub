@@ -3,7 +3,7 @@ package by.testtask.balancehub.dto.req;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class UserRequests {
+public class UserModificationRequests {
 
     public record AddEmailRequest(@NotBlank String email) {}
 

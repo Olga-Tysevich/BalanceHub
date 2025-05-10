@@ -2,6 +2,9 @@ volumes:
   pg_balancehub:
     name: pg_balancehub_db_volume
     external: false
+  es_data:
+    name: es_data_volume
+    external: false
 
 services:
   balancehub_db:
@@ -17,6 +20,22 @@ services:
 
     ports:
       - ${BALANCE_HUB_DB_HOST}:${BALANCE_HUB_DB_EPORT}:${BALANCE_HUB_DB_PORT}
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.0
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xmx512m -Xms512m
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - ${ELASTIC_HTTP_API_PORT}
+      - ${ELASTIC_HTTP_TRANSPORT_PORT}
+    restart: always
 
   app:
     restart: no

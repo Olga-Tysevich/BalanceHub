@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import static by.testtask.balancehub.dto.req.UserRequests.*;
+import static by.testtask.balancehub.dto.req.UserModificationRequests.*;
 
 import java.util.Map;
 
