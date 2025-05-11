@@ -33,24 +33,30 @@ public class JwtProvider {
     @Value(("${spring.application.security.jwt.refresh-key.expiration-time}"))
     private Integer jwtRefreshExpirationTime;
 
-    public String generateAccessToken(@NotNull User user) {
+    public String generateAccessToken(@NotNull User user, String currentLogin) {
         final Date accessExpiration = generateAccessExpiration(jwtAccessExpirationTime);
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(currentLogin)
                 .setExpiration(accessExpiration)
                 .signWith(getJwtAccessSecret())
                 .claim(USER_CLAIM_KEY, user.getId())
                 .compact();
     }
 
-    public String generateRefreshToken(@NotNull User user) {
+    public String generateRefreshToken(@NotNull String currentLogin) {
         final Date refreshExpiration = generateAccessExpiration(jwtRefreshExpirationTime);
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(currentLogin)
                 .setExpiration(refreshExpiration)
                 .signWith(getJwtRefreshSecret())
                 .compact();
 
+    }
+
+    public String getSubjectFromToken(@NotNull String token, boolean isAccessToken) {
+        Key secretKey = isAccessToken ? getJwtAccessSecret() : getJwtRefreshSecret();
+        Claims claims = getClaims(token, secretKey);
+        return claims.getSubject();
     }
 
     public boolean validateAccessToken(@NotNull String accessToken) {

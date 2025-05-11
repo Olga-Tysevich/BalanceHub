@@ -18,7 +18,7 @@ class AuthServiceImplTestTest extends BaseTest {
     @Test
     void loginUser_withEmail_success() {
         UserLoginDTO loginDTO = new UserLoginDTO();
-        loginDTO.setEmailOrPhone(USERNAME_1_EMAIL.getLast());
+        loginDTO.setEmailOrPhone(USERNAME_1_EMAIL_LIST.getLast());
         loginDTO.setPassword(USERNAME_1_PASSWORD);
 
         LoggedUserDTO loggedUser = authService.loginUser(loginDTO);
@@ -30,7 +30,7 @@ class AuthServiceImplTestTest extends BaseTest {
     @Test
     void loginUser_withPhone_success() {
         UserLoginDTO loginDTO = new UserLoginDTO();
-        loginDTO.setEmailOrPhone(USERNAME_1_PHONE.getFirst());
+        loginDTO.setEmailOrPhone(USERNAME_1_PHONE_LIST.getFirst());
         loginDTO.setPassword(USERNAME_1_PASSWORD);
 
         LoggedUserDTO loggedUser = authService.loginUser(loginDTO);
@@ -42,7 +42,7 @@ class AuthServiceImplTestTest extends BaseTest {
     @Test
     void loginUser_withWrongPassword_fails() {
         UserLoginDTO loginDTO = new UserLoginDTO();
-        loginDTO.setEmailOrPhone(USERNAME_1_EMAIL.getFirst());
+        loginDTO.setEmailOrPhone(USERNAME_1_EMAIL_LIST.getFirst());
         loginDTO.setPassword("wrongPassword");
 
         assertThrows(Exception.class, () -> authService.loginUser(loginDTO));

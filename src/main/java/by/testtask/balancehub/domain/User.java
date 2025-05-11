@@ -36,9 +36,9 @@ public class User implements UserDetails {
     @Size(max = 500, message = NAME_CANNOT_BE_GZ_500)
     private String name;
 
-    @Column(name = "date_of_birthday")
-    @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
-    private LocalDate dateOfBirthday;
+    @Column(name = "date_of_birth")
+    @Past(message = DATE_OF_BIRTH_MUST_BE_IN_PAST)
+    private LocalDate dateOfBirth;
 
     @Column(length = 500)
     @Size(min = 8, max = 500, message = INVALID_PASSWORD_LENGTH)
@@ -46,18 +46,18 @@ public class User implements UserDetails {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @CollectionSize(message = EMPTY_PHONE_SET)
     private Set<PhoneData> phones;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @CollectionSize(message = EMPTY_EMAIL_SET)
     private Set<EmailData> emails;
 
     @Transient
-    private final Set<GrantedAuthority> roleSet = Set.of(new SimpleGrantedAuthority("USER"));
+    private final Set<GrantedAuthority> roleSet = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,5 +67,15 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return name;
+    }
+
+
+    public boolean isContainsEmail(String email) {
+        return emails.stream().anyMatch(e -> e.getEmail().equals(email));
+    }
+
+
+    public boolean isContainsPhone(String phone) {
+        return phones.stream().anyMatch(e -> e.getPhoneNumber().equals(phone));
     }
 }

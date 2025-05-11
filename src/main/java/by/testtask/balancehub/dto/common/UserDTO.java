@@ -1,9 +1,10 @@
 package by.testtask.balancehub.dto.common;
 
-import by.testtask.balancehub.domain.EmailData;
-import by.testtask.balancehub.domain.PhoneData;
+import by.testtask.balancehub.conf.jackson.CustomLocalDateDeserializer;
+import by.testtask.balancehub.conf.jackson.CustomLocalDateSerializer;
 import by.testtask.balancehub.utils.validators.CollectionSize;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -12,7 +13,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static by.testtask.balancehub.utils.Constants.*;
 
@@ -29,9 +29,10 @@ public class UserDTO {
     @Size(max = 500, message = NAME_CANNOT_BE_GZ_500)
     private String name;
 
-    @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
-    @JsonFormat(pattern = DATE_OF_BIRTHDAY_PATTERN)
-    private LocalDate dateOfBirthday;
+    @Past(message = DATE_OF_BIRTH_MUST_BE_IN_PAST)
+    @JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = CustomLocalDateDeserializer.class)
+    private LocalDate dateOfBirth;
 
     @CollectionSize(message = EMPTY_PHONE_SET)
     private Set<InnerPhoneData> phones;
@@ -39,29 +40,6 @@ public class UserDTO {
     @CollectionSize(message = EMPTY_PHONE_SET)
     private Set<InnerEmailData> emails;
 
-    public void setPhoneFromDTO(Set<PhoneDataDTO> phones) {
-        this.phones = phones.stream()
-                .map(InnerPhoneData::new)
-                .collect(Collectors.toSet());
-    }
-
-    public void setEmailFromDTO(Set<EmailDataDTO> emails) {
-        this.emails = emails.stream()
-                .map(InnerEmailData::new)
-                .collect(Collectors.toSet());
-    }
-
-    public void setPhoneFrom(Set<PhoneData> phones) {
-        this.phones = phones.stream()
-                .map(InnerPhoneData::new)
-                .collect(Collectors.toSet());
-    }
-
-    public void innerEmailFrom(Set<EmailData> emails) {
-        this.emails = emails.stream()
-                .map(InnerEmailData::new)
-                .collect(Collectors.toSet());
-    }
 
     @Data
     @AllArgsConstructor
@@ -69,16 +47,6 @@ public class UserDTO {
     public static class InnerPhoneData {
         private Long id;
         private String phone;
-
-        public InnerPhoneData(PhoneDataDTO phone) {
-            this.id = phone.getId();
-            this.phone = phone.getPhoneNumber();
-        }
-
-        public InnerPhoneData(PhoneData phone) {
-            this.id = phone.getId();
-            this.phone = phone.getPhoneNumber();
-        }
     }
 
     @Data
@@ -87,16 +55,6 @@ public class UserDTO {
     public static class InnerEmailData {
         private Long id;
         private String email;
-
-        public InnerEmailData(EmailDataDTO email) {
-            this.id = email.getId();
-            this.email = email.getEmail();
-        }
-
-        public InnerEmailData(EmailData email) {
-            this.id = email.getId();
-            this.email = email.getEmail();
-        }
     }
 
 }

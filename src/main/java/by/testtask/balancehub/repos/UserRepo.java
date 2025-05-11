@@ -1,6 +1,7 @@
 package by.testtask.balancehub.repos;
 
 import by.testtask.balancehub.domain.User;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,8 @@ public interface UserRepo extends JpaRepository<User, Long> {
                 LEFT JOIN u.phones p
                 WHERE e.email = :value OR p.phoneNumber = :value
             """)
-    Optional<User> findByEmailOrPhone(@Param("value") String value);
+    Optional<User> findByEmailOrPhone(@NotBlank @Param("value") String value);
+
+    Optional<User> findByName(@NotBlank String name);
 
 }

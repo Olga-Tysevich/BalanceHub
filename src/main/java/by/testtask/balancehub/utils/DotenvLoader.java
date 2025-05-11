@@ -9,6 +9,9 @@ import java.util.Objects;
 public class DotenvLoader {
     public static void load() {
         Dotenv dotenv = Dotenv.load();
+
+        System.setProperty("BALANCE_HUB_APPLICATION_HOST", Objects.requireNonNull(dotenv.get("BALANCE_HUB_APPLICATION_HOST")));
+
         System.setProperty("JWT_ACCESS_KEY_SECRET", Objects.requireNonNull(dotenv.get("JWT_ACCESS_KEY_SECRET")));
         System.setProperty("JWT_ACCESS_KEY_EXPIRATION_TIME", Objects.requireNonNull(dotenv.get("JWT_ACCESS_KEY_EXPIRATION_TIME")));
         System.setProperty("JWT_REFRESH_KEY_SECRET", Objects.requireNonNull(dotenv.get("JWT_REFRESH_KEY_SECRET")));
@@ -23,5 +26,10 @@ public class DotenvLoader {
         System.setProperty("BALANCE_HUB_WEB_ALLOWED_METHODS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_ALLOWED_METHODS")));
         System.setProperty("BALANCE_HUB_WEB_ALLOWED_HEADERS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_ALLOWED_HEADERS")));
         System.setProperty("BALANCE_HUB_WEB_IGNORED_URLS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_IGNORED_URLS")));
+
+        System.setProperty("ELASTIC_HOST", Objects.requireNonNull(dotenv.get("ELASTIC_HOST")));
+        System.setProperty("ELASTIC_API_PORT", Objects.requireNonNull(dotenv.get("ELASTIC_API_PORT")));
+        System.setProperty("ELASTIC_USERNAME", Objects.requireNonNull(dotenv.get("ELASTIC_USERNAME")));
+        System.setProperty("ELASTIC_PASSWORD", Objects.requireNonNull(dotenv.get("ELASTIC_PASSWORD")));
     }
 }

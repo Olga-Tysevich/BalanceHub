@@ -25,9 +25,9 @@ public class JwtServiceImpl implements JwtService {
     private final UserRepo userRepo;
 
     @Override
-    public LoggedUserDTO generatePairOfTokens(User user) {
-        String accessToken = jwtProvider.generateAccessToken(user);
-        String refreshToken = jwtProvider.generateRefreshToken(user);
+    public LoggedUserDTO generatePairOfTokens(User user, String currentLogin) {
+        String accessToken = jwtProvider.generateAccessToken(user, currentLogin);
+        String refreshToken = jwtProvider.generateRefreshToken(currentLogin);
         return LoggedUserDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -42,12 +42,14 @@ public class JwtServiceImpl implements JwtService {
             throw new InvalidRefreshTokenException();
         }
 
+        String currentLogin = jwtProvider.getSubjectFromToken(refreshToken, false);
+
         Long id = ((Number) jwtProvider.getRefreshClaims(refreshToken).get(USER_CLAIM_KEY)).longValue();
 
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
 
-        return generatePairOfTokens(user);
+        return generatePairOfTokens(user, currentLogin);
     }
 
 }

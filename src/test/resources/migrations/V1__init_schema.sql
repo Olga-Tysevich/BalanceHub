@@ -6,7 +6,7 @@ CREATE TABLE USERS
 (
     ID               BIGINT PRIMARY KEY,
     NAME             VARCHAR(500),
-    DATE_OF_BIRTHDAY DATE,
+    DATE_OF_BIRTH DATE,
     PASSWORD         VARCHAR(500)
 );
 
@@ -46,9 +46,9 @@ CREATE TABLE PHONE_DATA
     CONSTRAINT FK_PHONE_USER FOREIGN KEY (USER_ID) REFERENCES USERS (ID)
 );
 
-INSERT INTO "users" (id, name, date_of_birthday, password)
+INSERT INTO "users" (id, name, date_of_birth, password)
 VALUES (1, 'Alice Johnson', '1985-02-10', '$2a$10$aC0AZKlIDDsj0wq9KHGeleIvCsxorMCvs1QzdvWEI2VjqvaAnjIxK'),
-       (2, 'Bob Smith', '1990-07-15', '$2a$10$md8WKR8A0hDR.pJ37OUoyOmRxoXqjVeQS8PPuzhRr7zuX0WKcKbEy'),
+       (2, 'Bob Smith', '1990-07-15', '$2a$10$YO04iG0WFIOefjSWaXrb3OVfR7mrotw2jpMhADwpFJFm/pO2hlBUC'),
        (3, 'Charlie Brown', '1982-12-03', '$2a$10$6ZdnvnFxR8h7a8XjeWYuLu/OIEhqcr6vBmuAmIyBzQOItuYvhgT52'),
        (4, 'Diana Prince', '1995-05-21', '$2a$10$eGFGLR.w6B0cKcG3JODDeOb7F78Fvkph3tBBu3a4UKxPoIOwmEB66');
 

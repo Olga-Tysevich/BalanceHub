@@ -1,4 +1,4 @@
-INSERT INTO "users" (id, name, date_of_birthday, password) VALUES
+INSERT INTO "users" (id, name, date_of_birth, password) VALUES
     (1, 'Alice Johnson', '1985-02-10', '$2a$10$aC0AZKlIDDsj0wq9KHGeleIvCsxorMCvs1QzdvWEI2VjqvaAnjIxK'),
     (2, 'Bob Smith', '1990-07-15', '$2a$10$md8WKR8A0hDR.pJ37OUoyOmRxoXqjVeQS8PPuzhRr7zuX0WKcKbEy'),
     (3, 'Charlie Brown', '1982-12-03', '$2a$10$6ZdnvnFxR8h7a8XjeWYuLu/OIEhqcr6vBmuAmIyBzQOItuYvhgT52'),
