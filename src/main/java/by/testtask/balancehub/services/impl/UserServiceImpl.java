@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (request.searchByDateOfBirth()) {
-            users.put(UserSearchType.BY_BIRTHDAY, userSearchService.searchByDateOfBirthday(request.getDateOfBirth(), request.getPage(), request.getSize()));
+            users.put(UserSearchType.BY_BIRTHDAY, userSearchService.searchByDateOfBirth(request.getDateOfBirth(), request.getPage(), request.getSize()));
         }
 
         return users;

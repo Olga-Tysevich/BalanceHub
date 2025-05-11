@@ -23,7 +23,7 @@ public class UserIndex {
     private String name;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dateOfBirthday;
+    private LocalDate dateOfBirth;
 
     private List<PhoneIndex> phones;
 

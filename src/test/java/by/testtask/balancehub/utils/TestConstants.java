@@ -1,5 +1,6 @@
 package by.testtask.balancehub.utils;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TestConstants {
@@ -7,11 +8,6 @@ public interface TestConstants {
     String BASE_URL = "http://localhost:%s/v1/api";
     int DEFAULT_APP_PORT = 8080;
     long DEFAULT_TIMEOUT = 1500L;
-    String USER_ID_PARAM = "id";
-    String PAGE_PARAM = "page";
-    long DEFAULT_PAGE = 0;
-    String COUNT_PER_PAGE_PARAM = "size";
-    long DEFAULT_COUNT_PER_PAGE = 5;
 
     String USERNAME_1 = "Alice Johnson";
     String USERNAME_2 = "Bob Smith";
@@ -33,18 +29,18 @@ public interface TestConstants {
     List<String> USERNAME_3_PHONE_LIST = List.of("79203333301", "792033333302");
     List<String> USERNAME_4_PHONE_LIST = List.of("79204444401", "79204444402");
 
-    String USERNAME_1_DATE_OF_BIRTHDAY_DAY_BEFORE = "1985-02-09";
-    String USERNAME_1_DATE_OF_BIRTHDAY = "1985-02-10";
-    String USERNAME_2_DATE_OF_BIRTHDAY = "1990-07-15";
-    String USERNAME_3_DATE_OF_BIRTHDAY = "1982-12-03";
-    String USERNAME_4_DATE_OF_BIRTHDAY = "1995-05-21";
+    LocalDate USERNAME_1_DATE_OF_BIRTH_BEFORE = LocalDate.of(19985, 2,9);
+    LocalDate USERNAME_3_DATE_OF_BIRTH_BEFORE = LocalDate.of(1982, 12,2);
+
+    LocalDate USERNAME_1_DATE_OF_BIRTH = LocalDate.of(1985, 2,10);
+    LocalDate USERNAME_2_DATE_OF_BIRTH = LocalDate.of(1990, 7,15);
+    LocalDate USERNAME_3_DATE_OF_BIRTH = LocalDate.of(1982, 12,3);
+    LocalDate USERNAME_4_DATE_OF_BIRTH = LocalDate.of(1995, 5,21);
 
     String USERNAME_1_PASSWORD = "passAlice1";
     String USERNAME_2_PASSWORD = "passBob12";
     String USERNAME_3_PASSWORD = "charlieP3";
     String USERNAME_4_PASSWORD = "dianaPa44";
-
-    String USERNAME_2_PASSWORD_HASH = "$2a$10$md8WKR8A0hDR.pJ37OUoyOmRxoXqjVeQS8PPuzhRr7zuX0WKcKbEy";
 
     Long USERNAME_1_ACCOUNT_ID = 1L;
     Long USERNAME_2_ACCOUNT_ID = 2L;

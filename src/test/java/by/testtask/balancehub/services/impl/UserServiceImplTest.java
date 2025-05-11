@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
@@ -154,7 +153,7 @@ class UserServiceImplTest extends BaseTest {
         request.setName(USERNAME_1);
         request.setPhone(USERNAME_1_PHONE_LIST.getFirst());
         request.setEmail(USERNAME_1_EMAIL_LIST.getFirst());
-        request.setDateOfBirth(LocalDate.parse(USERNAME_1_DATE_OF_BIRTHDAY_DAY_BEFORE));
+        request.setDateOfBirth(USERNAME_1_DATE_OF_BIRTH_BEFORE);
         request.setPage(0);
         request.setSize(10);
 
@@ -228,7 +227,7 @@ class UserServiceImplTest extends BaseTest {
         UserSearchReq request = new UserSearchReq();
         request.setPage(0);
         request.setSize(10);
-        request.setDateOfBirth(LocalDate.parse(USERNAME_1_DATE_OF_BIRTHDAY));
+        request.setDateOfBirth(USERNAME_1_DATE_OF_BIRTH);
 
         Map<UserSearchType, UserPageResp> users = userService.find(request);
 

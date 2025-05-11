@@ -6,7 +6,6 @@ public interface Constants {
     String USER_CLAIM_KEY = "USER_ID";
     String REFRESH_TOKEN_KEY = "refresh-token";
 
-    String DATE_OF_BIRTHDAY_PATTERN = "dd.MM.yyyy";
     String REGEXP_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     String REGEXP_PHONE = "^[0-9]{11}$";
 
@@ -16,7 +15,7 @@ public interface Constants {
     String BALANCE_CANNOT_BE_NULL = "Balance cannot be null";
     String NAME_CANNOT_BE_EMPTY = "Name cannot be null or empty!";
     String NAME_CANNOT_BE_GZ_500 = "Name cannot exceed 500 characters";
-    String DATE_OF_BIRTHDAY_MUST_BE_IN_PAST = "Date of birth must be in the past";
+    String DATE_OF_BIRTH_MUST_BE_IN_PAST = "Date of birth must be in the past";
     String INVALID_PASSWORD_LENGTH = "Password must be between 8 and 500 characters";
     String INVALID_EMAIL_MESSAGE = "Invalid email format. Valid email example: example@domain.com";
     String EMAIL_CANNOT_BE_NULL_OR_EMPTY = "Email cannot be null or empty!";

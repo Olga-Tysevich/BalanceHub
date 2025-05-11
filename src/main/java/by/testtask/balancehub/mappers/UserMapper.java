@@ -19,16 +19,6 @@ import java.util.stream.Collectors;
 public interface UserMapper {
 
     @Mappings({
-            @Mapping(target = "dateOfBirthday", dateFormat = "dd.MM.yyyy")
-    })
-    UserDTO toDto(User user);
-
-    @Mappings({
-            @Mapping(target = "password", ignore = true)
-    })
-    User toEntity(UserDTO dto);
-
-    @Mappings({
             @Mapping(target = "phoneNumber", source = "phone"),
             @Mapping(target = "user", ignore = true)
     })
@@ -96,13 +86,4 @@ public interface UserMapper {
                 .collect(Collectors.toSet());
     }
 
-    @AfterMapping
-    default void linkUserToPhonesAndEmails(@MappingTarget User user) {
-        if (user.getPhones() != null) {
-            user.getPhones().forEach(phone -> phone.setUser(user));
-        }
-        if (user.getEmails() != null) {
-            user.getEmails().forEach(email -> email.setUser(user));
-        }
-    }
 }

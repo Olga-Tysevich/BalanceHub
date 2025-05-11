@@ -47,7 +47,7 @@ public class ElasticsearchInitializer {
                                     .properties("id", p2 -> p2.long_(l -> l))
                                     .properties("phone", p2 -> p2.keyword(k -> k))
                             ))
-                            .properties("dateOfBirthday", p -> p.date(d -> d))
+                            .properties("dateOfBirth", p -> p.date(d -> d))
                     )
             );
         }

@@ -22,7 +22,7 @@ public class UserSearchReq {
     private String email;
     @Pattern(regexp = REGEXP_PHONE, message = INVALID_PHONE_FORMAT)
     private String phone;
-    @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
+    @Past(message = DATE_OF_BIRTH_MUST_BE_IN_PAST)
     private LocalDate dateOfBirth;
     @Min(value = 0, message = "Page must be a positive integer")
     private int page;

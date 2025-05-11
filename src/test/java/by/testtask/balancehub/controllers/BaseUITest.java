@@ -32,14 +32,14 @@ public class BaseUITest extends BaseTest {
                 .contentType(ContentType.JSON);
     }
 
-    protected ValidatableResponse checkStatusCodeAndBodyInPostRequest(String url, int code, String schema,
-                                                                      Object requestBody, String validUserDataJson) {
+    protected ValidatableResponse checkStatusCodeAndBodyInGetRequest(String url, int code, String schema,
+                                                                     Object requestBody, String validUserDataJson) {
         String accessToken = getAccessToken(validUserDataJson);
         return RestAssured.given(requestSpecification)
                 .header(TOKEN_HEADER, TOKEN_TYPE + accessToken)
                 .body(requestBody)
                 .port(DEFAULT_APP_PORT)
-                .post(url)
+                .get(url)
                 .then()
                 .statusCode(code)
                 .body(matchesJsonSchemaInClasspath(schema))

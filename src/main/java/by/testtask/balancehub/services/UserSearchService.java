@@ -16,6 +16,6 @@ public interface UserSearchService {
     UserPageResp searchByEmail(@NotBlank String email, int page, int size);
     UserPageResp searchByPhone(@NotBlank String phone, int page, int size);
 
-    UserPageResp searchByDateOfBirthday(@NotNull LocalDate dateOfBirth, int page, int size);
+    UserPageResp searchByDateOfBirth(@NotNull LocalDate dateOfBirth, int page, int size);
 
 }

@@ -36,9 +36,9 @@ public class User implements UserDetails {
     @Size(max = 500, message = NAME_CANNOT_BE_GZ_500)
     private String name;
 
-    @Column(name = "date_of_birthday")
-    @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
-    private LocalDate dateOfBirthday;
+    @Column(name = "date_of_birth")
+    @Past(message = DATE_OF_BIRTH_MUST_BE_IN_PAST)
+    private LocalDate dateOfBirth;
 
     @Column(length = 500)
     @Size(min = 8, max = 500, message = INVALID_PASSWORD_LENGTH)

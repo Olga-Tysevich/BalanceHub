@@ -67,7 +67,7 @@ public class UserSearchServiceImpl implements UserSearchService {
     }
 
     @Override
-    public UserPageResp searchByDateOfBirthday(LocalDate dateOfBirth, int page, int size) {
+    public UserPageResp searchByDateOfBirth(LocalDate dateOfBirth, int page, int size) {
         List<Query> queries = new ArrayList<>(addDateOfBirthQuery(dateOfBirth));
 
         return createRequest(queries, page, size);
@@ -156,7 +156,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         queries.add(Query.of(q -> q
                 .range(r -> r
                         .date(d -> d
-                                .field("dateOfBirthday")
+                                .field("dateOfBirth")
                                 .gt(dateOfBirth.toString())
                         )
                 )

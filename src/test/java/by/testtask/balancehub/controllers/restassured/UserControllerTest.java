@@ -1,6 +1,8 @@
-package by.testtask.balancehub.controllers;
+package by.testtask.balancehub.controllers.restassured;
 
+import by.testtask.balancehub.controllers.BaseUITest;
 import by.testtask.balancehub.dto.common.UserDTO;
+import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,7 +11,6 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,12 +30,12 @@ class UserControllerTest extends BaseUITest {
                 USERNAME_3,
                 USERNAME_3_EMAIL_LIST.getLast(),
                 USERNAME_3_PHONE_LIST.getFirst(),
-                LocalDate.parse(USERNAME_3_DATE_OF_BIRTHDAY),
+                USERNAME_3_DATE_OF_BIRTH_BEFORE,
                 0,
                 10
         );
 
-        ValidatableResponse response = checkStatusCodeAndBodyInPostRequest(
+        ValidatableResponse response = checkStatusCodeAndBodyInGetRequest(
                 "/users/find",
                 HttpStatus.OK.value(),
                 SCHEME_SOURCE_PATH + "user_dto.json",
@@ -52,8 +53,8 @@ class UserControllerTest extends BaseUITest {
                 }
         );
 
-        UserPageResp userPageResp = resultMap.get("BY_PHONE");
-        assertNotNull(userPageResp, "Ответ по ключу BY_PHONE не найден");
+        UserPageResp userPageResp = resultMap.get(UserSearchType.BY_ALL.name());
+        assertNotNull(userPageResp, "Ответ по ключу BY_ALL не найден");
 
         Set<UserDTO> users = userPageResp.getUsers();
         assertEquals(1, users.size(), "Ожидался один пользователь");
@@ -61,4 +62,5 @@ class UserControllerTest extends BaseUITest {
         assertEquals(1, userPageResp.getTotalUsers());
         assertEquals(1, userPageResp.getTotalPages());
     }
+
 }
