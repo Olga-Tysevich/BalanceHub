@@ -154,7 +154,7 @@ class UserServiceImplTest extends BaseTest {
         request.setName(USERNAME_1);
         request.setPhone(USERNAME_1_PHONE_LIST.getFirst());
         request.setEmail(USERNAME_1_EMAIL_LIST.getFirst());
-        request.setDateOfBirth(LocalDate.parse(USERNAME_1_DATE_OF_BIRTHDAY));
+        request.setDateOfBirth(LocalDate.parse(USERNAME_1_DATE_OF_BIRTHDAY_DAY_BEFORE));
         request.setPage(0);
         request.setSize(10);
 

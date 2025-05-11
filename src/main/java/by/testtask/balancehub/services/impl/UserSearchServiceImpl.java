@@ -33,9 +33,11 @@ public class UserSearchServiceImpl implements UserSearchService {
 
         if (Objects.nonNull(req.getName())) queries.addAll(addNameQuery(req.getName()));
 
+        if (Objects.nonNull(req.getEmail())) queries.addAll(addEmailQuery(req.getEmail()));
+
         if (Objects.nonNull(req.getPhone())) queries.addAll(addPhoneQuery(req.getPhone()));
 
-        if (Objects.nonNull(req.getDateOfBirth())) queries.addAll(addDateOfBirthGteQuery(req.getDateOfBirth()));
+        if (Objects.nonNull(req.getDateOfBirth())) queries.addAll(addDateOfBirthQuery(req.getDateOfBirth()));
 
         return createRequest(queries, req.getPage(), req.getSize());
     }
@@ -63,7 +65,7 @@ public class UserSearchServiceImpl implements UserSearchService {
 
     @Override
     public UserPageResp searchByDateOfBirthday(LocalDate dateOfBirth, int page, int size) {
-        List<Query> queries = new ArrayList<>(addDateOfBirthGtQuery(dateOfBirth));
+        List<Query> queries = new ArrayList<>(addDateOfBirthQuery(dateOfBirth));
 
         return createRequest(queries, page, size);
     }
@@ -78,7 +80,6 @@ public class UserSearchServiceImpl implements UserSearchService {
 
         try {
             SearchResponse<UserDTO> response = elasticsearchClient.search(searchRequest, UserDTO.class);
-            System.out.println("Total hits: " + response.hits().total().value());
 
             Set<UserDTO> users = response.hits().hits().stream()
                     .map(Hit::source)
@@ -120,7 +121,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                         .path("emails")
                         .query(q2 -> q2
                                 .term(t -> t
-                                        .field("emails.email.keyword")
+                                        .field("emails.email")
                                         .value(email)
                                 )
                         )
@@ -136,7 +137,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                         .path("phones")
                         .query(q2 -> q2
                                 .term(t -> t
-                                        .field("phones.phone.keyword")
+                                        .field("phones.phone")
                                         .value(phone)
                                 )
                         )
@@ -145,22 +146,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         return queries;
     }
 
-    private List<Query> addDateOfBirthGteQuery(LocalDate dateOfBirth) {
-        List<Query> queries = new ArrayList<>();
-
-        queries.add(Query.of(q -> q
-                .range(r -> r
-                        .date(d -> d
-                                .field("dateOfBirthday")
-                                .gte(dateOfBirth.toString())
-                        )
-                )
-        ));
-
-        return queries;
-    }
-
-    private List<Query> addDateOfBirthGtQuery(LocalDate dateOfBirth) {
+    private List<Query> addDateOfBirthQuery(LocalDate dateOfBirth) {
         List<Query> queries = new ArrayList<>();
 
         queries.add(Query.of(q -> q
