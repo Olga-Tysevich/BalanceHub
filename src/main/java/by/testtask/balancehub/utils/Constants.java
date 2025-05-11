@@ -4,6 +4,7 @@ public interface Constants {
     String TOKEN_HEADER = "Authorization";
     String TOKEN_TYPE = "Bearer";
     String USER_CLAIM_KEY = "USER_ID";
+    String REFRESH_TOKEN_KEY = "refresh-token";
 
     String DATE_OF_BIRTHDAY_PATTERN = "dd.MM.yyyy";
     String REGEXP_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";

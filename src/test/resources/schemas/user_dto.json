@@ -1,0 +1,394 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "BY_NAME": {
+      "type": "object",
+      "properties": {
+        "searchType": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "dateOfBirthday": {
+                "type": "string",
+                "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$"
+              },
+              "phones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "phone"
+                  ]
+                }
+              },
+              "emails": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "email"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "dateOfBirthday",
+              "phones",
+              "emails"
+            ]
+          }
+        }
+      },
+      "required": [
+        "searchType",
+        "users"
+      ]
+    },
+    "BY_EMAIL": {
+      "type": "object",
+      "properties": {
+        "searchType": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "dateOfBirthday": {
+                "type": "string",
+                "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$"
+              },
+              "phones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "phone"
+                  ]
+                }
+              },
+              "emails": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "email"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "dateOfBirthday",
+              "phones",
+              "emails"
+            ]
+          }
+        }
+      },
+      "required": [
+        "searchType",
+        "users"
+      ]
+    },
+    "BY_PHONE": {
+      "type": "object",
+      "properties": {
+        "searchType": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "dateOfBirthday": {
+                "type": "string",
+                "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$"
+              },
+              "phones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "phone"
+                  ]
+                }
+              },
+              "emails": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "email"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "dateOfBirthday",
+              "phones",
+              "emails"
+            ]
+          }
+        }
+      },
+      "required": [
+        "searchType",
+        "users"
+      ]
+    },
+    "BY_BIRTHDAY": {
+      "type": "object",
+      "properties": {
+        "searchType": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "dateOfBirthday": {
+                "type": "string",
+                "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$"
+              },
+              "phones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "phone"
+                  ]
+                }
+              },
+              "emails": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "email"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "dateOfBirthday",
+              "phones",
+              "emails"
+            ]
+          }
+        }
+      },
+      "required": [
+        "searchType",
+        "users"
+      ]
+    },
+    "BY_ALL": {
+      "type": "object",
+      "properties": {
+        "searchType": {
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "dateOfBirthday": {
+                "type": "string",
+                "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$"
+              },
+              "phones": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "phone"
+                  ]
+                }
+              },
+              "emails": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "email"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "dateOfBirthday",
+              "phones",
+              "emails"
+            ]
+          }
+        }
+      },
+      "required": [
+        "searchType",
+        "users"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "$ref": "#/properties/BY_NAME"
+    },
+    {
+      "$ref": "#/properties/BY_EMAIL"
+    },
+    {
+      "$ref": "#/properties/BY_PHONE"
+    },
+    {
+      "$ref": "#/properties/BY_BIRTHDAY"
+    },
+    {
+      "$ref": "#/properties/BY_ALL"
+    }
+  ]
+}

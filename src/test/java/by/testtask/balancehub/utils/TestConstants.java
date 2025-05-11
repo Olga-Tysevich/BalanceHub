@@ -3,6 +3,16 @@ package by.testtask.balancehub.utils;
 import java.util.List;
 
 public interface TestConstants {
+    String SCHEME_SOURCE_PATH = "schemas/";
+    String BASE_URL = "http://localhost:%s/v1/api";
+    int DEFAULT_APP_PORT = 8080;
+    long DEFAULT_TIMEOUT = 1500L;
+    String USER_ID_PARAM = "id";
+    String PAGE_PARAM = "page";
+    long DEFAULT_PAGE = 0;
+    String COUNT_PER_PAGE_PARAM = "size";
+    long DEFAULT_COUNT_PER_PAGE = 5;
+
     String USERNAME_1 = "Alice Johnson";
     String USERNAME_2 = "Bob Smith";
     String USERNAME_3 = "Charlie Brown";
@@ -34,8 +44,12 @@ public interface TestConstants {
     String USERNAME_3_PASSWORD = "charlieP3";
     String USERNAME_4_PASSWORD = "dianaPa44";
 
+    String USERNAME_2_PASSWORD_HASH = "$2a$10$md8WKR8A0hDR.pJ37OUoyOmRxoXqjVeQS8PPuzhRr7zuX0WKcKbEy";
+
     Long USERNAME_1_ACCOUNT_ID = 1L;
     Long USERNAME_2_ACCOUNT_ID = 2L;
     Long USERNAME_3_ACCOUNT_ID = 3L;
     Long USERNAME_4_ACCOUNT_ID = 4L;
+
+    String USER_CRED = "{\"emailOrPhone\": \"" + USERNAME_2_EMAIL_LIST.getFirst() + "\", \"password\": \"" + USERNAME_2_PASSWORD + "\"}";
 }

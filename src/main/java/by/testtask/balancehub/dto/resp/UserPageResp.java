@@ -14,7 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class UserPageResp {
-    private String searchType;
     private Set<UserDTO> users;
     private int page;
     private int totalPages;

@@ -6,7 +6,7 @@ import by.testtask.balancehub.dto.resp.LoggedUserDTO;
 
 public interface JwtService {
 
-    LoggedUserDTO generatePairOfTokens(User user);
+    LoggedUserDTO generatePairOfTokens(User user, String currentLogin);
 
     LoggedUserDTO regeneratePairOfTokens(String refreshToken);
 

@@ -19,4 +19,6 @@ public interface UserRepo extends JpaRepository<User, Long> {
             """)
     Optional<User> findByEmailOrPhone(@NotBlank @Param("value") String value);
 
+    Optional<User> findByName(@NotBlank String name);
+
 }

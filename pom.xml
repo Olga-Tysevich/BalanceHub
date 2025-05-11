@@ -37,6 +37,7 @@
 		<flyway.version>11.8.1</flyway.version>
 		<testcontainers.version>1.21.0</testcontainers.version>
 		<commons-compress.version>1.27.</commons-compress.version>
+		<rest-assured.version>5.4.0</rest-assured.version>
 	</properties>
 
 	<dependencies>
@@ -168,6 +169,24 @@
 			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-path</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

@@ -1,8 +1,10 @@
 package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.dto.common.UserDTO;
+import by.testtask.balancehub.dto.elasticsearch.UserIndex;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
+import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.services.UserSearchService;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ROLE_USER')")
 public class UserSearchServiceImpl implements UserSearchService {
     private final ElasticsearchClient elasticsearchClient;
+    private final UserMapper userMapper;
 
     @Override
     public UserPageResp searchByAll(UserSearchReq req) {
@@ -79,17 +82,18 @@ public class UserSearchServiceImpl implements UserSearchService {
         );
 
         try {
-            SearchResponse<UserDTO> response = elasticsearchClient.search(searchRequest, UserDTO.class);
+            SearchResponse<UserIndex> response = elasticsearchClient.search(searchRequest, UserIndex.class);
 
-            Set<UserDTO> users = response.hits().hits().stream()
+            Set<UserIndex> users = response.hits().hits().stream()
                     .map(Hit::source)
                     .collect(Collectors.toSet());
+            Set<UserDTO> t = users.stream().map(userMapper::toUserDTO).collect(Collectors.toSet());
 
             int totalHits = Objects.nonNull(response.hits().total()) ? (int) response.hits().total().value() : 0;
             int totalPages = (int) Math.ceil((double) totalHits / size);
 
             return UserPageResp.builder()
-                    .users(users)
+                    .users(t)
                     .page(page)
                     .totalPages(totalPages)
                     .totalUsers(totalHits)

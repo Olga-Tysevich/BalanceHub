@@ -1,5 +1,8 @@
 package by.testtask.balancehub.controllers;
 
+import by.testtask.balancehub.dto.common.UserSearchType;
+import by.testtask.balancehub.dto.req.UserSearchReq;
+import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +56,12 @@ public class UserController {
     public ResponseEntity<?> deletePhone(@RequestBody @Valid DeletePhoneRequest req) {
         Long userId = userService.deletePhone(req.phoneId());
         return ResponseEntity.ok(Map.of("userId", userId));
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<Map<UserSearchType, UserPageResp>> find(@RequestBody @Valid UserSearchReq req) {
+        Map<UserSearchType, UserPageResp> result = userService.find(req);
+        return ResponseEntity.ok(result);
     }
 
 }
