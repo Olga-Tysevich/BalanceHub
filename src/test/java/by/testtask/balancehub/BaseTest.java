@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,7 +44,7 @@ public class BaseTest {
         redisContainer.start();
     }
 
-    @Test
+    @BeforeEach
     public void testSomethingUsingLettuce() {
         // Retrieve the Redis URI from the container
         String redisURI = redisContainer.getRedisURI();

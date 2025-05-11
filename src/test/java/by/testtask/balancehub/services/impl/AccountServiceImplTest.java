@@ -30,7 +30,6 @@ class AccountServiceIntegrationTest extends BaseTest {
    @Autowired
     private AccountServiceImpl accountService;
 
-
     @Test
     void testTransferMoney() {
         Account fromAccount = accountRepo.findById(1L).get();
