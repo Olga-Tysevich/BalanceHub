@@ -29,7 +29,7 @@ public interface TestConstants {
     List<String> USERNAME_3_PHONE_LIST = List.of("79203333301", "792033333302");
     List<String> USERNAME_4_PHONE_LIST = List.of("79204444401", "79204444402");
 
-    LocalDate USERNAME_1_DATE_OF_BIRTH_BEFORE = LocalDate.of(19985, 2,9);
+    LocalDate USERNAME_1_DATE_OF_BIRTH_BEFORE = LocalDate.of(1985, 2,9);
     LocalDate USERNAME_3_DATE_OF_BIRTH_BEFORE = LocalDate.of(1982, 12,2);
 
     LocalDate USERNAME_1_DATE_OF_BIRTH = LocalDate.of(1985, 2,10);

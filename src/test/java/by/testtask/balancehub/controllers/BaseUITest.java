@@ -11,6 +11,7 @@ import static by.testtask.balancehub.utils.Constants.TOKEN_TYPE;
 import static by.testtask.balancehub.utils.TestConstants.*;
 import static io.restassured.RestAssured.given;
 
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,10 @@ public class BaseUITest extends BaseTest {
                 .extract().response()
                 .jsonPath()
                 .getString("accessToken");
+    }
+
+    @Test
+    public void baseTest() {
     }
 
 }
