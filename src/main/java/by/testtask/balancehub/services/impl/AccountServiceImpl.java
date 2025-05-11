@@ -66,9 +66,8 @@ public class AccountServiceImpl implements AccountService {
         BigDecimal transferAmount = transfer.getAmount();
         BigDecimal newBalance = toAccount.getBalance().add(transferAmount);
 
-        toAccount.setBalance(newBalance);
-
         try {
+            toAccount.setBalance(newBalance);
             accountRepo.save(toAccount);
 
             Account fromAccount = transfer.getFromAccount();

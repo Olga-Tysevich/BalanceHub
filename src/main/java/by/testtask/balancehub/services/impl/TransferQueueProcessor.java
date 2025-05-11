@@ -29,8 +29,8 @@ public class TransferQueueProcessor {
 
         Transfer confirmedTransfer = redisTemplate.opsForList().rightPop(CONFIRMED_TRANSFER_QUEUE_NAME);
         if (Objects.nonNull(confirmedTransfer)) {
+            //Тут можно слать уведомления юзеру или еще что-то
             System.out.println("Processing confirmed transfer from queue: " + confirmedTransfer);
-            accountService.makeTransfer(confirmedTransfer);
         }
     }
 }
