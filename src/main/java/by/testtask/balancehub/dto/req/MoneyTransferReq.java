@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-import static by.testtask.balancehub.utils.Constants.BALANCE_CANNOT_BE_NULL;
-import static by.testtask.balancehub.utils.Constants.USER_ID_CANNOT_BE_NULL;
+import static by.testtask.balancehub.utils.Constants.*;
 
 @Data
 @NoArgsConstructor

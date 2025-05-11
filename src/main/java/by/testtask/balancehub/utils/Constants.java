@@ -9,6 +9,9 @@ public interface Constants {
     String REGEXP_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     String REGEXP_PHONE = "^[0-9]{11}$";
 
+    String TRANSFER_QUEUE_NAME = "transferQueue";
+    String CONFIRMED_TRANSFER_QUEUE_NAME = "transferConfirmedQueue";
+
     String ID_CANNOT_BE_NULL = "ID cannot be null!";
     String USER_ID_CANNOT_BE_NULL = "User id must be specified";
     String USER_CANNOT_BE_NULL = "User must be specified";
@@ -31,5 +34,7 @@ public interface Constants {
     String TOKEN_CANNOT_BE_NULL_OR_EMPTY = "Token cannot be null or empty!";
     String INVALID_REFRESH_TOKEN = "Invalid refresh token!";
     String BALANCE_MUST_BE_POSITIVE = "Balance must be positive!";
+    String HOLD_MUST_BE_POSITIVE = "Hold balance must be positive!";
+    String HOLD_MUST_BE_NULL = "Hold balance cannot be null";
 
 }

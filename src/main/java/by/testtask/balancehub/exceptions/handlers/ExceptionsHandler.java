@@ -25,7 +25,10 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ExceptionsHandler {
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({
+            AccessDeniedException.class,
+            ProhibitedException.class
+    })
     public ResponseEntity<?> accessExceptions(AccessDeniedException e) {
         return buildExceptionResponse(HttpStatus.FORBIDDEN, e);
     }

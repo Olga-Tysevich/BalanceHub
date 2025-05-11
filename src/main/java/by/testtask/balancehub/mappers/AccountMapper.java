@@ -24,7 +24,8 @@ public interface AccountMapper {
     Account toEntity(final AccountDTO accountDTO, final User owner);
 
     @Mappings({
-            @Mapping(target = "userId", source = "user.id")
+            @Mapping(target = "userId", source = "user.id"),
+            @Mapping(target = "hold", ignore = true)
     })
     AccountDTO toDTO(final Account account);
 

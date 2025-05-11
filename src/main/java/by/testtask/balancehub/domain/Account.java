@@ -37,4 +37,13 @@ public class Account {
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @Column(nullable = false, precision = 19, scale = 2)
+    @NotNull(message = HOLD_MUST_BE_NULL)
+    @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
+    @Builder.Default
+    private BigDecimal hold = BigDecimal.ZERO;
+
+    @Version
+    private Long version;
+
 }

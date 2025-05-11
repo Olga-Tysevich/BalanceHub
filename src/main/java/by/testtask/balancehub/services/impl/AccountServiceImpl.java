@@ -1,21 +1,29 @@
 package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.domain.Account;
+import by.testtask.balancehub.domain.Transfer;
+import by.testtask.balancehub.domain.TransferStatus;
 import by.testtask.balancehub.domain.User;
 import by.testtask.balancehub.dto.common.AccountDTO;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
+import by.testtask.balancehub.events.Events;
+import by.testtask.balancehub.exceptions.ProhibitedException;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.mappers.AccountMapper;
 import by.testtask.balancehub.repos.AccountRepo;
+import by.testtask.balancehub.repos.TransferRepo;
 import by.testtask.balancehub.services.AccountService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,7 +31,9 @@ import java.util.Objects;
 @PreAuthorize("hasRole('ROLE_USER')")
 public class AccountServiceImpl implements AccountService {
     private final AccountRepo accountRepo;
-    private  final AccountMapper accountMapper;
+    private final AccountMapper accountMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final TransferRepo transferRepo;
 
     @Override
     public Long createAccount(AccountDTO accountDTO) {
@@ -48,10 +58,92 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void transfer(MoneyTransferReq moneyTransferReq) {
+    public void makeTransfer(Transfer transfer) {
+        Account toAccount = transfer.getToAccount();
 
+        BigDecimal transferAmount = transfer.getAmount();
+        BigDecimal newBalance = toAccount.getBalance().add(transferAmount);
+
+        toAccount.setBalance(newBalance);
+
+        try {
+            accountRepo.save(toAccount);
+        } catch (Exception e) {
+            transfer.setStatus(TransferStatus.FAILED);
+            transferRepo.save(transfer);
+
+            Account fromAccount = transfer.getFromAccount();
+            fromAccount.setBalance(fromAccount.getBalance().add(transferAmount));
+            fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+
+            accountRepo.save(fromAccount);
+            eventPublisher.publishEvent(transfer);
+        }
+
+        Account fromAccount = transfer.getFromAccount();
+        fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+        accountRepo.save(fromAccount);
+
+        transfer.setStatus(TransferStatus.CONFIRMED);
+        transferRepo.save(transfer);
+
+        Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transfer);
+
+        eventPublisher.publishEvent(transferConfirmed);
     }
 
+    @Override
+    public void createTransfer(MoneyTransferReq moneyTransferReq) {
+
+        User currentUser = PrincipalExtractor.getCurrentUser();
+
+        if (Objects.isNull(currentUser)) throw new UnauthorizedException();
+        Long fromAccountId = moneyTransferReq.getFromAccountId();
+
+        Long currentUserId = currentUser.getId();
+        Optional<Long> accountOwnerId = accountRepo.findUserIdByAccountId(fromAccountId);
+
+        if (accountOwnerId.isEmpty() || accountOwnerId.get().equals(currentUserId)) {
+            Long ownerId = accountOwnerId.orElseGet(() -> null);
+
+            throw new ProhibitedException("The account owner is different from the current user. " +
+                    "Owner id: " + ownerId + ", current user id: " + currentUserId);
+        }
+
+        BigDecimal amount = moneyTransferReq.getAmount();
+
+        Optional<Account> fromAccountOpt = accountRepo.findByIdAndSufficientBalance(fromAccountId, amount);
+
+
+        if (fromAccountOpt.isEmpty()) {
+            throw new ProhibitedException("Insufficient balance: the balance is too low for this operation. Account id: " + fromAccountId);
+        }
+
+        Long toAccountId = moneyTransferReq.getToAccountId();
+        Optional<Account> toAccountOpt = accountRepo.findById(toAccountId);
+
+        if (toAccountOpt.isEmpty()) {
+            throw new ProhibitedException("The specified recipient account does not exist!. Account id: " + toAccountOpt);
+        }
+
+        Account fromAccount = fromAccountOpt.get();
+        Account toAccount = toAccountOpt.get();
+
+        BigDecimal holdAmount = moneyTransferReq.getAmount();
+        BigDecimal newAccountFromAmount = moneyTransferReq.getAmount().subtract(holdAmount);
+        fromAccount.setHold(holdAmount);
+        toAccount.setBalance(newAccountFromAmount);
+        accountRepo.save(fromAccount);
+
+        Transfer transfer = Transfer.builder()
+                .fromAccount(fromAccount)
+                .toAccount(toAccount)
+                .build();
+
+        Events.TransferEvent transferEvent = new Events.TransferEvent(transfer);
+
+        eventPublisher.publishEvent(transferEvent);
+    }
 
 
 }
