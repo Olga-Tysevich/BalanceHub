@@ -76,6 +76,7 @@ public class AccountServiceImpl implements AccountService {
             accountRepo.save(fromAccount);
 
             transfer.setStatus(TransferStatus.CONFIRMED);
+            transfer.setConfirmedAt(LocalDateTime.now());
             transferRepo.save(transfer);
 
             Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transfer);
