@@ -68,6 +68,18 @@ public class AccountServiceImpl implements AccountService {
 
         try {
             accountRepo.save(toAccount);
+
+            Account fromAccount = transfer.getFromAccount();
+            fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+            accountRepo.save(fromAccount);
+
+            transfer.setStatus(TransferStatus.CONFIRMED);
+            transferRepo.save(transfer);
+
+            Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transfer);
+
+            eventPublisher.publishEvent(transferConfirmed);
+
         } catch (Exception e) {
             transfer.setStatus(TransferStatus.FAILED);
             transferRepo.save(transfer);
@@ -79,17 +91,6 @@ public class AccountServiceImpl implements AccountService {
             accountRepo.save(fromAccount);
             eventPublisher.publishEvent(transfer);
         }
-
-        Account fromAccount = transfer.getFromAccount();
-        fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
-        accountRepo.save(fromAccount);
-
-        transfer.setStatus(TransferStatus.CONFIRMED);
-        transferRepo.save(transfer);
-
-        Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transfer);
-
-        eventPublisher.publishEvent(transferConfirmed);
     }
 
     @Override
