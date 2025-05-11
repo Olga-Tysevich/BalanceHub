@@ -1,4 +1,5 @@
 package by.testtask.balancehub.conf.elasticsearch;
+
 import by.testtask.balancehub.dto.elasticsearch.UserIndex;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.UserRepo;
@@ -48,6 +49,10 @@ public class ElasticsearchInitializer {
                                     .properties("phone", p2 -> p2.keyword(k -> k))
                             ))
                             .properties("dateOfBirth", p -> p.date(d -> d))
+                            .properties("account", p -> p.nested(n -> n
+                                    .properties("id", p2 -> p2.long_(l -> l))
+                                    .properties("balance", p2 -> p2.keyword(k -> k))
+                            ))
                     )
             );
         }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,6 +30,8 @@ public class UserIndex {
 
     private List<EmailIndex> emails;
 
+    private AccountIndex account;
+
 
     @Data
     @NoArgsConstructor
@@ -46,6 +49,15 @@ public class UserIndex {
     public static class EmailIndex {
         private Long id;
         private String email;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AccountIndex {
+        private Long id;
+        private BigDecimal balance;
     }
 
 }

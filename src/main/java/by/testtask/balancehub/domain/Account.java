@@ -1,7 +1,7 @@
 package by.testtask.balancehub.domain;
 
-import by.testtask.balancehub.utils.validators.PositiveBalance;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +33,8 @@ public class Account {
 
     @Column(nullable = false, precision = 19, scale = 2)
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
-    @PositiveBalance
-    private BigDecimal balance;
+    @DecimalMin(value = "0.00", message = BALANCE_MUST_BE_POSITIVE)
+    @Builder.Default
+    private BigDecimal balance = BigDecimal.ZERO;
 
 }

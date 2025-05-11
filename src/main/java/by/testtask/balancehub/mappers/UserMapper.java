@@ -1,5 +1,6 @@
 package by.testtask.balancehub.mappers;
 
+import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
@@ -38,15 +39,34 @@ public interface UserMapper {
 
     @Mappings({
             @Mapping(source = "phones", target = "phones", qualifiedByName = "mapPhones"),
-            @Mapping(source = "emails", target = "emails", qualifiedByName = "mapEmails")
+            @Mapping(source = "emails", target = "emails", qualifiedByName = "mapEmails"),
+            @Mapping(source = "account", target = "account", qualifiedByName = "mapAccountToIndex")
+
     })
     UserIndex toUserIndex(User entity);
 
     @Mappings({
             @Mapping(source = "phones", target = "phones", qualifiedByName = "mapPhonesFromIndex"),
-            @Mapping(source = "emails", target = "emails", qualifiedByName = "mapEmailsFromIndex")
+            @Mapping(source = "emails", target = "emails", qualifiedByName = "mapEmailsFromIndex"),
+            @Mapping(source = "account", target = "account", qualifiedByName = "mapAccountFromIndex")
+
     })
     UserDTO toUserDTO(UserIndex index);
+
+    @Named("mapAccountToIndex")
+    default UserIndex.AccountIndex mapAccountToIndex(Account account) {
+        if (Objects.isNull(account)) return null;
+        return UserIndex.AccountIndex.builder()
+                .id(account.getId())
+                .balance(account.getBalance())
+                .build();
+    }
+
+    @Named("mapAccountFromIndex")
+    default UserDTO.InnerAccountData mapAccountFromIndex(UserIndex.AccountIndex index) {
+        if (Objects.isNull(index)) return null;
+        return new UserDTO.InnerAccountData(index.getId(), index.getBalance());
+    }
 
     @Named("mapPhones")
     default List<UserIndex.PhoneIndex> mapPhones(Set<PhoneData> phones) {
@@ -79,7 +99,7 @@ public interface UserMapper {
     }
 
     @Named("mapEmailsFromIndex")
-    default Set<UserDTO.InnerEmailData> mapEmailIndexList(List<UserIndex.EmailIndex> emails ) {
+    default Set<UserDTO.InnerEmailData> mapEmailIndexList(List<UserIndex.EmailIndex> emails) {
         if (Objects.isNull(emails)) return null;
         return emails.stream()
                 .map(e -> new UserDTO.InnerEmailData(e.getId(), e.getEmail()))

@@ -1,6 +1,5 @@
 package by.testtask.balancehub.dto.common;
 
-import by.testtask.balancehub.utils.validators.PositiveBalance;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,6 @@ public class AccountDTO {
     private Long userId;
 
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
-    @PositiveBalance
     private BigDecimal balance;
 
 }

@@ -32,7 +32,6 @@ public class ExceptionsHandler {
 
     @ExceptionHandler({
             HttpMediaTypeException.class,
-            PasswordMismatchException.class,
             HttpMessageNotReadableException.class,
             MissingRequestCookieException.class,
             MissingRequestHeaderException.class,
@@ -54,7 +53,8 @@ public class ExceptionsHandler {
 
     @ExceptionHandler({
             EmailAlreadyInUse.class,
-            PhoneAlreadyInUse.class
+            PhoneAlreadyInUse.class,
+            AccountAlreadyExists.class
     })
     public ResponseEntity<?> conflictExceptions(Exception e) {
         return buildExceptionResponse(HttpStatus.CONFLICT, e);

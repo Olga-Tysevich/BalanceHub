@@ -9,6 +9,7 @@ import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
 import by.testtask.balancehub.exceptions.EmailAlreadyInUse;
+import by.testtask.balancehub.exceptions.PhoneAlreadyInUse;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.EmailDataRepo;
@@ -83,7 +84,7 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!emailDataRepo.existsByIdAndUserId(emailId, userId))
-            throw new AccessDeniedException("The current index is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
+            throw new AccessDeniedException("The current user is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
 
         emailDataRepo.deleteById(emailId);
         publishEvent();
@@ -123,7 +124,7 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!phoneDataRepo.existsByIdAndUserId(phoneId, userId))
-            throw new AccessDeniedException("The current index is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
+            throw new AccessDeniedException("The current user is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
 
         phoneDataRepo.deleteById(phoneId);
         publishEvent();
@@ -153,7 +154,7 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
 
         if (currentUser.isContainsPhone(phone))
-            throw new EmailAlreadyInUse(phone, "Phone has already been added for the current with id: " + currentUser.getId());
+            throw new PhoneAlreadyInUse(phone, "Phone has already been added for the current with id: " + currentUser.getId());
 
 
         Long currentUserId = currentUser.getId();
