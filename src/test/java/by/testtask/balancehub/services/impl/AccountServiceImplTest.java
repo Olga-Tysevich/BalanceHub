@@ -27,7 +27,7 @@ class AccountServiceIntegrationTest extends BaseTest {
     @Autowired
     private TransferRepo transferRepo;
 
-   @Autowired
+    @Autowired
     private AccountServiceImpl accountService;
 
     @Test
@@ -50,13 +50,8 @@ class AccountServiceIntegrationTest extends BaseTest {
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
         accountService.createTransfer(transfer);
 
-        Transfer processedTransfer = new Transfer();
-        processedTransfer.setFromAccount(fromAccount);
-        processedTransfer.setToAccount(toAccount);
-        processedTransfer.setAmount(new BigDecimal("50.00"));
-        transferRepo.save(processedTransfer);
-
-        accountService.makeTransfer(processedTransfer);
+        fromAccount = accountRepo.findById(1L).get();
+        toAccount = accountRepo.findById(2L).get();
 
         assertThat(toAccount.getBalance()).isEqualTo(new BigDecimal("50.00"));
         assertThat(fromAccount.getHold()).isEqualTo(new BigDecimal("50.00"));
