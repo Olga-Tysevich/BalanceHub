@@ -4,7 +4,6 @@ import by.testtask.balancehub.BaseTest;
 import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
 import by.testtask.balancehub.repos.AccountRepo;
-import by.testtask.balancehub.repos.TransferRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
