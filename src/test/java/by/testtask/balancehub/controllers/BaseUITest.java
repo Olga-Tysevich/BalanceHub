@@ -17,6 +17,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class BaseUITest extends BaseTest {
@@ -61,6 +63,8 @@ public class BaseUITest extends BaseTest {
 
     @Test
     public void baseTest() {
+        String accessToken = getAccessToken(USER_CRED);
+        assertFalse("Access token should not be empty", accessToken.isEmpty());
     }
 
 }
