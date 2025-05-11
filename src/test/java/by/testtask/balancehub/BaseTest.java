@@ -32,7 +32,7 @@ import org.testcontainers.utility.DockerImageName;
 public class BaseTest {
     @Autowired
     private UserDetailsService userDetailsService;
-    private static final RedisContainer redisContainer = new RedisContainer(DockerImageName.parse("""
+    private static RedisContainer redisContainer = new RedisContainer(DockerImageName.parse("""
             redis:latest"""))
             .withExposedPorts(6379);
 
