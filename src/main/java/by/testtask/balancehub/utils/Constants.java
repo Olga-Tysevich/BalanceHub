@@ -28,7 +28,7 @@ public interface Constants {
     String ACCESS_DENIED = "Access Denied";
     String ACCESS_DENIED_MESSAGE = "User do not have permission to access this resource.";
     String NOT_AUTHORIZED = "Access Denied";
-    String UNKNOWN_USER = "Unknown dto";
+    String UNKNOWN_USER = "Unknown index";
     String TOKEN_CANNOT_BE_NULL_OR_EMPTY = "Token cannot be null or empty!";
     String INVALID_REFRESH_TOKEN = "Invalid refresh token!";
 

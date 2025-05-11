@@ -3,8 +3,8 @@ package by.testtask.balancehub.services.impl;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
+import by.testtask.balancehub.dto.elasticsearch.UserIndex;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!emailDataRepo.existsByIdAndUserId(emailId, userId))
-            throw new AccessDeniedException("The current dto is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
+            throw new AccessDeniedException("The current index is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
 
         emailDataRepo.deleteById(emailId);
         publishEvent();
@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!phoneDataRepo.existsByIdAndUserId(phoneId, userId))
-            throw new AccessDeniedException("The current dto is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
+            throw new AccessDeniedException("The current index is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
 
         phoneDataRepo.deleteById(phoneId);
         publishEvent();
@@ -171,9 +171,9 @@ public class UserServiceImpl implements UserService {
 
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
 
-        UserDTO userDTO = userMapper.toDto(currentUser);
+        UserIndex index = userMapper.toUserIndex(currentUser);
 
-        eventPublisher.publishEvent(new Events.UserChangedEvent(userDTO));
+        eventPublisher.publishEvent(new Events.UserChangedEvent(index));
     }
 
 }

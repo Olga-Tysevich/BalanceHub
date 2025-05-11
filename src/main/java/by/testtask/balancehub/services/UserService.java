@@ -9,9 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
- * Service interface for managing dto's contact information such as emails and phone numbers.
+ * Service interface for managing index's contact information such as emails and phone numbers.
  * <p>
- * Each method returns the ID of the dto to whom the updated, added, or deleted data belongs.
+ * Each method returns the ID of the index to whom the updated, added, or deleted data belongs.
  */
 public interface UserService {
 

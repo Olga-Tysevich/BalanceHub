@@ -1,5 +1,5 @@
 package by.testtask.balancehub.conf.elasticsearch;
-import by.testtask.balancehub.dto.common.UserDTO;
+import by.testtask.balancehub.dto.elasticsearch.UserIndex;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.UserRepo;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -58,24 +56,19 @@ public class ElasticsearchInitializer {
 
     //TODO логи
     private void syncAllUsersToElasticsearch() {
-        Set<UserDTO> users = transactionTemplate.execute(status -> getAllUsers());
+        Set<UserIndex> users = transactionTemplate.execute(status -> getAllUsers());
 
         if (Objects.isNull(users) || users.isEmpty()) return;
 
         try {
             List<BulkOperation> operations = users.stream()
-                    .map(userDTO -> {
-                        LocalDate dateOfBirthday = userDTO.getDateOfBirthday();
-                        String formattedDate = dateOfBirthday != null ? dateOfBirthday.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
-                        LocalDate dateOfBirthdayFormatted = Objects.nonNull(formattedDate) ? LocalDate.parse(formattedDate) : null;
-                        userDTO.setDateOfBirthday(dateOfBirthdayFormatted);
-
-                        System.out.println("Синхронизация пользователя: " + userDTO);
+                    .map(index -> {
+                        System.out.println("Синхронизация пользователя: " + index);
                         return BulkOperation.of(op -> op
                                 .index(IndexOperation.of(i -> i
                                         .index("users")
-                                        .id(userDTO.getId().toString())
-                                        .document(userDTO)
+                                        .id(index.getId().toString())
+                                        .document(index)
                                 ))
                         );
                     })
@@ -101,9 +94,9 @@ public class ElasticsearchInitializer {
         }
     }
 
-    private Set<UserDTO> getAllUsers() {
+    private Set<UserIndex> getAllUsers() {
         return userRepo.findAll().stream()
-                .map(userMapper::toDto)
+                .map(userMapper::toUserIndex)
                 .collect(Collectors.toSet());
     }
 }

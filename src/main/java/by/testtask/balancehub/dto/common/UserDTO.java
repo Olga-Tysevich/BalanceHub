@@ -1,10 +1,10 @@
 package by.testtask.balancehub.dto.common;
 
 import by.testtask.balancehub.conf.jackson.CustomLocalDateDeserializer;
+import by.testtask.balancehub.conf.jackson.CustomLocalDateSerializer;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.utils.validators.CollectionSize;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotBlank;
@@ -33,8 +33,8 @@ public class UserDTO {
     private String name;
 
     @Past(message = DATE_OF_BIRTHDAY_MUST_BE_IN_PAST)
+    @JsonSerialize(using = CustomLocalDateSerializer.class)
     @JsonDeserialize(using = CustomLocalDateDeserializer.class)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirthday;
 
     @CollectionSize(message = EMPTY_PHONE_SET)
