@@ -2,7 +2,6 @@ package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.BaseTest;
 import by.testtask.balancehub.domain.Account;
-import by.testtask.balancehub.domain.Transfer;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
 import by.testtask.balancehub.repos.AccountRepo;
 import by.testtask.balancehub.repos.TransferRepo;
