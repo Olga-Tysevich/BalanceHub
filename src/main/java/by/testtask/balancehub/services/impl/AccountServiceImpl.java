@@ -104,7 +104,7 @@ public class AccountServiceImpl implements AccountService {
         Long currentUserId = currentUser.getId();
         Optional<Long> accountOwnerId = accountRepo.findUserIdByAccountId(fromAccountId);
 
-        if (accountOwnerId.isEmpty() || accountOwnerId.get().equals(currentUserId)) {
+        if (accountOwnerId.isEmpty() || !accountOwnerId.get().equals(currentUserId)) {
             Long ownerId = accountOwnerId.orElseGet(() -> null);
 
             throw new ProhibitedException("The account owner is different from the current user. " +
