@@ -13,19 +13,22 @@ import java.util.Collection;
 )
 public interface AccountMapper {
     @Mappings({
-            @Mapping(target = "user", ignore = true)
+            @Mapping(target = "user", ignore = true),
+            @Mapping(target = "hold", ignore = true),
+            @Mapping(target = "version", ignore = true)
     })
     Account toEntity(final AccountDTO accountDTO);
 
     @Mappings({
             @Mapping(target = "id", source = "accountDTO.id"),
-            @Mapping(target = "user", source = "owner")
+            @Mapping(target = "hold", ignore = true),
+            @Mapping(target = "user", source = "owner"),
+            @Mapping(target = "version", ignore = true)
     })
     Account toEntity(final AccountDTO accountDTO, final User owner);
 
     @Mappings({
-            @Mapping(target = "userId", source = "user.id"),
-            @Mapping(target = "hold", ignore = true)
+            @Mapping(target = "userId", source = "user.id")
     })
     AccountDTO toDTO(final Account account);
 

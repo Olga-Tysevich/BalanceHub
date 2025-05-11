@@ -16,21 +16,21 @@ import static by.testtask.balancehub.utils.Constants.TRANSFER_QUEUE_NAME;
 @RequiredArgsConstructor
 public class TransferQueueProcessor {
     private final AccountService accountService;
-    private final RedisTemplate<String, Transfer> redisTemplate;
+//    private final RedisTemplate<String, Transfer> redisTemplate;
 
 
     @Scheduled(fixedRate = 5000)
     public void processQueue() {
-        Transfer transfer = redisTemplate.opsForList().rightPop(TRANSFER_QUEUE_NAME);
-        if (Objects.nonNull(transfer)) {
-            System.out.println("Processing transfer from queue: " + transfer);
-            accountService.makeTransfer(transfer);
-        }
-
-        Transfer confirmedTransfer = redisTemplate.opsForList().rightPop(CONFIRMED_TRANSFER_QUEUE_NAME);
-        if (Objects.nonNull(confirmedTransfer)) {
-            //Тут можно слать уведомления юзеру или еще что-то
-            System.out.println("Processing confirmed transfer from queue: " + confirmedTransfer);
-        }
+//        Transfer transfer = redisTemplate.opsForList().rightPop(TRANSFER_QUEUE_NAME);
+//        if (Objects.nonNull(transfer)) {
+//            System.out.println("Processing transfer from queue: " + transfer);
+//            accountService.makeTransfer(transfer);
+//        }
+//
+//        Transfer confirmedTransfer = redisTemplate.opsForList().rightPop(CONFIRMED_TRANSFER_QUEUE_NAME);
+//        if (Objects.nonNull(confirmedTransfer)) {
+//            //Тут можно слать уведомления юзеру или еще что-то
+//            System.out.println("Processing confirmed transfer from queue: " + confirmedTransfer);
+//        }
     }
 }

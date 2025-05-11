@@ -240,4 +240,6 @@ class UserServiceImplTest extends BaseTest {
         assertNotNull(userSet);
         assertEquals(6, userSet.size());
     }
+
+
 }
