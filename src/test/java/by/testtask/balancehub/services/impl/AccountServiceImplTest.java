@@ -24,7 +24,7 @@ class AccountServiceIntegrationTest extends BaseTest {
     private AccountRepo accountRepo;
 
     @Autowired
-    private TransferRepo transferRepo;
+    private TransferQueueProcessor transferQueueProcessor;
 
     @Autowired
     private AccountServiceImpl accountService;
@@ -48,6 +48,8 @@ class AccountServiceIntegrationTest extends BaseTest {
 
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
         accountService.createTransfer(transfer);
+
+        transferQueueProcessor.processQueue();
 
         fromAccount = accountRepo.findById(1L).get();
         toAccount = accountRepo.findById(2L).get();
