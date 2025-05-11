@@ -13,20 +13,20 @@ import static by.testtask.balancehub.utils.Constants.TRANSFER_QUEUE_NAME;
 @Component
 @RequiredArgsConstructor
 public class TransferEventListener {
-//    private final RedisTemplate<String, Transfer> redisTemplate;
+    private final RedisTemplate<String, Transfer> redisTemplate;
 
     @EventListener
     public void handleTransferEvent(Events.TransferEvent event) {
         Transfer transfer = event.transfer();
         System.out.println("Transfer Event Received: " + transfer);
-//        redisTemplate.opsForList().leftPush(TRANSFER_QUEUE_NAME, transfer);
+        redisTemplate.opsForList().leftPush(TRANSFER_QUEUE_NAME, transfer);
     }
 
     @EventListener
     public void handleTransferConfirmedEvent(Events.TransferConfirmed event) {
         Transfer transfer = event.transfer();
         System.out.println("Transfer Confirmed Event Received: " + transfer);
-//        redisTemplate.opsForList().leftPush(CONFIRMED_TRANSFER_QUEUE_NAME, transfer);
+        redisTemplate.opsForList().leftPush(CONFIRMED_TRANSFER_QUEUE_NAME, transfer);
     }
 
 }
