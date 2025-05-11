@@ -6,6 +6,7 @@ import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.utils.validators.CollectionSize;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;

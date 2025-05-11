@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -63,6 +65,11 @@ public class ElasticsearchInitializer {
         try {
             List<BulkOperation> operations = users.stream()
                     .map(userDTO -> {
+                        LocalDate dateOfBirthday = userDTO.getDateOfBirthday();
+                        String formattedDate = dateOfBirthday != null ? dateOfBirthday.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
+                        LocalDate dateOfBirthdayFormatted = Objects.nonNull(formattedDate) ? LocalDate.parse(formattedDate) : null;
+                        userDTO.setDateOfBirthday(dateOfBirthdayFormatted);
+
                         System.out.println("Синхронизация пользователя: " + userDTO);
                         return BulkOperation.of(op -> op
                                 .index(IndexOperation.of(i -> i

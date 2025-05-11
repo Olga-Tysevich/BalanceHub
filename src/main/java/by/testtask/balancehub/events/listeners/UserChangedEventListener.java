@@ -8,6 +8,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +20,11 @@ public class UserChangedEventListener {
     @EventListener
     public void onUserChanged(Events.UserChangedEvent event) {
         UserDTO dto = event.dto();
+
+        LocalDate dateOfBirthday = dto.getDateOfBirthday();
+        String formattedDate = dateOfBirthday != null ? dateOfBirthday.format(DateTimeFormatter.ISO_LOCAL_DATE) : null;
+        LocalDate dateOfBirthdayFormatted = Objects.nonNull(formattedDate) ? LocalDate.parse(formattedDate) : null;
+        dto.setDateOfBirthday(dateOfBirthdayFormatted);
 
         try {
             elasticsearchClient.index(i -> i
