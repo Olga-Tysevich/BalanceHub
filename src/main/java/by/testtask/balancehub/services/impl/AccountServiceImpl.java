@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -137,6 +139,7 @@ public class AccountServiceImpl implements AccountService {
         accountRepo.save(fromAccount);
 
         Transfer transfer = Transfer.builder()
+                .createdAt(LocalDateTime.now())
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
                 .build();

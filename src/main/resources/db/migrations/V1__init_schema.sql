@@ -59,7 +59,7 @@ CREATE TABLE transfers
     amount         DECIMAL(19, 2) NOT NULL,
     status         VARCHAR(50) NOT NULL,
     created_at     TIMESTAMP NOT NULL,
-    confirmed_at   TIMESTAMP NOT NULL,
+    confirmed_at   TIMESTAMP,
     version        BIGINT,
     CONSTRAINT fk_transfer_from_account FOREIGN KEY (from_account_id) REFERENCES accounts (id),
     CONSTRAINT fk_transfer_to_account   FOREIGN KEY (to_account_id) REFERENCES accounts (id)
