@@ -1,6 +1,6 @@
 package by.testtask.balancehub.conf.elasticsearch;
 
-import by.testtask.balancehub.dto.elasticsearch.UserIndex;
+import by.testtask.balancehub.dto.elasticsearch.UserIndexDTO;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.UserRepo;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -61,7 +61,7 @@ public class ElasticsearchInitializer {
 
     //TODO логи
     private void syncAllUsersToElasticsearch() {
-        Set<UserIndex> users = transactionTemplate.execute(status -> getAllUsers());
+        Set<UserIndexDTO> users = transactionTemplate.execute(status -> getAllUsers());
 
         if (Objects.isNull(users) || users.isEmpty()) return;
 
@@ -99,7 +99,7 @@ public class ElasticsearchInitializer {
         }
     }
 
-    private Set<UserIndex> getAllUsers() {
+    private Set<UserIndexDTO> getAllUsers() {
         return userRepo.findAll().stream()
                 .map(userMapper::toUserIndex)
                 .collect(Collectors.toSet());

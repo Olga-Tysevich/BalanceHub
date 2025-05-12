@@ -5,11 +5,13 @@ import by.testtask.balancehub.domain.Transfer;
 import by.testtask.balancehub.domain.TransferStatus;
 import by.testtask.balancehub.domain.User;
 import by.testtask.balancehub.dto.common.AccountDTO;
+import by.testtask.balancehub.dto.redis.TransferDTO;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
 import by.testtask.balancehub.events.Events;
 import by.testtask.balancehub.exceptions.ProhibitedException;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.mappers.AccountMapper;
+import by.testtask.balancehub.mappers.TransferMapper;
 import by.testtask.balancehub.repos.AccountRepo;
 import by.testtask.balancehub.repos.TransferRepo;
 import by.testtask.balancehub.services.AccountService;
@@ -22,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final ApplicationEventPublisher eventPublisher;
     private final TransferRepo transferRepo;
+    private final TransferMapper transferMapper;
 
     @Override
     public Long createAccount(AccountDTO accountDTO) {
@@ -60,38 +62,51 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void makeTransfer(Transfer transfer) {
-        Account toAccount = transfer.getToAccount();
+    public void makeTransfer(TransferDTO transferDTO) {
+        Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
 
-        BigDecimal transferAmount = transfer.getAmount();
+        BigDecimal transferAmount = transferDTO.getAmount();
         BigDecimal newBalance = toAccount.getBalance().add(transferAmount);
 
         try {
             toAccount.setBalance(newBalance);
             accountRepo.save(toAccount);
 
-            Account fromAccount = transfer.getFromAccount();
+            Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
             accountRepo.save(fromAccount);
 
+            transferDTO.setStatus(TransferStatus.CONFIRMED);
+            transferDTO.setConfirmedAt(LocalDateTime.now());
+
+            Transfer transfer = transferMapper.toEntity(transferDTO);
             transfer.setStatus(TransferStatus.CONFIRMED);
             transfer.setConfirmedAt(LocalDateTime.now());
+
             transferRepo.save(transfer);
 
-            Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transfer);
+            Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transferDTO);
 
+            transferDTO.setStatus(transfer.getStatus());
+            transferDTO.setConfirmedAt(transfer.getConfirmedAt());
             eventPublisher.publishEvent(transferConfirmed);
 
         } catch (Exception e) {
+
+            Transfer transfer = transferMapper.toEntity(transferDTO);
             transfer.setStatus(TransferStatus.FAILED);
+
             transferRepo.save(transfer);
 
-            Account fromAccount = transfer.getFromAccount();
+            transferDTO.setStatus(TransferStatus.FAILED);
+
+            Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
             fromAccount.setBalance(fromAccount.getBalance().add(transferAmount));
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
 
             accountRepo.save(fromAccount);
-            eventPublisher.publishEvent(transfer);
+
+            eventPublisher.publishEvent(transferDTO);
         }
     }
 
@@ -132,9 +147,9 @@ public class AccountServiceImpl implements AccountService {
         Account fromAccount = fromAccountOpt.get();
         Account toAccount = toAccountOpt.get();
 
-        BigDecimal holdAmount = moneyTransferReq.getAmount();
-        BigDecimal newAccountFromAmount = moneyTransferReq.getAmount().subtract(holdAmount);
-        fromAccount.setHold(holdAmount);
+        BigDecimal transferAmount = moneyTransferReq.getAmount();
+        BigDecimal newAccountFromAmount = moneyTransferReq.getAmount().subtract(transferAmount);
+        fromAccount.setHold(transferAmount);
         toAccount.setBalance(newAccountFromAmount);
         accountRepo.save(fromAccount);
 
@@ -143,8 +158,11 @@ public class AccountServiceImpl implements AccountService {
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
                 .build();
+        transferRepo.save(transfer);
 
-        Events.TransferEvent transferEvent = new Events.TransferEvent(transfer);
+        TransferDTO transferDTO = transferMapper.toDTO(transfer);
+
+        Events.TransferEvent transferEvent = new Events.TransferEvent(transferDTO);
 
         eventPublisher.publishEvent(transferEvent);
     }

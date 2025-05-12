@@ -1,7 +1,7 @@
 package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.dto.common.UserDTO;
-import by.testtask.balancehub.dto.elasticsearch.UserIndex;
+import by.testtask.balancehub.dto.elasticsearch.UserIndexDTO;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.mappers.UserMapper;
@@ -82,9 +82,9 @@ public class UserSearchServiceImpl implements UserSearchService {
         );
 
         try {
-            SearchResponse<UserIndex> response = elasticsearchClient.search(searchRequest, UserIndex.class);
+            SearchResponse<UserIndexDTO> response = elasticsearchClient.search(searchRequest, UserIndexDTO.class);
 
-            Set<UserIndex> users = response.hits().hits().stream()
+            Set<UserIndexDTO> users = response.hits().hits().stream()
                     .map(Hit::source)
                     .collect(Collectors.toSet());
             Set<UserDTO> t = users.stream().map(userMapper::toUserDTO).collect(Collectors.toSet());

@@ -5,7 +5,7 @@ import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
 import by.testtask.balancehub.dto.common.UserDTO;
-import by.testtask.balancehub.dto.elasticsearch.UserIndex;
+import by.testtask.balancehub.dto.elasticsearch.UserIndexDTO;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public interface UserMapper {
             @Mapping(source = "account", target = "account", qualifiedByName = "mapAccountToIndex")
 
     })
-    UserIndex toUserIndex(User entity);
+    UserIndexDTO toUserIndex(User entity);
 
     @Mappings({
             @Mapping(source = "phones", target = "phones", qualifiedByName = "mapPhonesFromIndex"),
@@ -51,28 +51,28 @@ public interface UserMapper {
             @Mapping(source = "account", target = "account", qualifiedByName = "mapAccountFromIndex")
 
     })
-    UserDTO toUserDTO(UserIndex index);
+    UserDTO toUserDTO(UserIndexDTO index);
 
     @Named("mapAccountToIndex")
-    default UserIndex.AccountIndex mapAccountToIndex(Account account) {
+    default UserIndexDTO.AccountIndex mapAccountToIndex(Account account) {
         if (Objects.isNull(account)) return null;
-        return UserIndex.AccountIndex.builder()
+        return UserIndexDTO.AccountIndex.builder()
                 .id(account.getId())
                 .balance(account.getBalance())
                 .build();
     }
 
     @Named("mapAccountFromIndex")
-    default UserDTO.InnerAccountData mapAccountFromIndex(UserIndex.AccountIndex index) {
+    default UserDTO.InnerAccountData mapAccountFromIndex(UserIndexDTO.AccountIndex index) {
         if (Objects.isNull(index)) return null;
         return new UserDTO.InnerAccountData(index.getId(), index.getBalance());
     }
 
     @Named("mapPhones")
-    default List<UserIndex.PhoneIndex> mapPhones(Set<PhoneData> phones) {
+    default List<UserIndexDTO.PhoneIndex> mapPhones(Set<PhoneData> phones) {
         if (Objects.isNull(phones)) return null;
         return phones.stream()
-                .map(p -> UserIndex.PhoneIndex.builder()
+                .map(p -> UserIndexDTO.PhoneIndex.builder()
                         .id(p.getId())
                         .phone(p.getPhoneNumber())
                         .build())
@@ -80,10 +80,10 @@ public interface UserMapper {
     }
 
     @Named("mapEmails")
-    default List<UserIndex.EmailIndex> mapEmails(Set<EmailData> emails) {
+    default List<UserIndexDTO.EmailIndex> mapEmails(Set<EmailData> emails) {
         if (Objects.isNull(emails)) return null;
         return emails.stream()
-                .map(e -> UserIndex.EmailIndex.builder()
+                .map(e -> UserIndexDTO.EmailIndex.builder()
                         .id(e.getId())
                         .email(e.getEmail())
                         .build())
@@ -91,7 +91,7 @@ public interface UserMapper {
     }
 
     @Named("mapPhonesFromIndex")
-    default Set<UserDTO.InnerPhoneData> mapPhoneIndexList(List<UserIndex.PhoneIndex> phones) {
+    default Set<UserDTO.InnerPhoneData> mapPhoneIndexList(List<UserIndexDTO.PhoneIndex> phones) {
         if (Objects.isNull(phones)) return null;
         return phones.stream()
                 .map(p -> new UserDTO.InnerPhoneData(p.getId(), p.getPhone()))
@@ -99,7 +99,7 @@ public interface UserMapper {
     }
 
     @Named("mapEmailsFromIndex")
-    default Set<UserDTO.InnerEmailData> mapEmailIndexList(List<UserIndex.EmailIndex> emails) {
+    default Set<UserDTO.InnerEmailData> mapEmailIndexList(List<UserIndexDTO.EmailIndex> emails) {
         if (Objects.isNull(emails)) return null;
         return emails.stream()
                 .map(e -> new UserDTO.InnerEmailData(e.getId(), e.getEmail()))

@@ -1,8 +1,9 @@
 package by.testtask.balancehub.services;
 
-import by.testtask.balancehub.domain.Transfer;
 import by.testtask.balancehub.dto.common.AccountDTO;
+import by.testtask.balancehub.dto.redis.TransferDTO;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
+import jakarta.validation.constraints.NotNull;
 
 public interface AccountService {
 
@@ -10,10 +11,10 @@ public interface AccountService {
     * Этот метод мог бы быть вызван если бы юзеры создавались через сервис,
     * но они создаются миграциями по заданию
     */
-    Long createAccount(AccountDTO accountDTO);
+    Long createAccount(@NotNull AccountDTO accountDTO);
 
-    void createTransfer(MoneyTransferReq moneyTransferReq);
+    void createTransfer(@NotNull MoneyTransferReq moneyTransferReq);
 
-    void makeTransfer(Transfer transfer);
+    void makeTransfer(@NotNull TransferDTO transferDTO);
 
 }

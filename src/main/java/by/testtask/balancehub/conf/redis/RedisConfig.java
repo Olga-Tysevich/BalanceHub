@@ -1,5 +1,7 @@
 package by.testtask.balancehub.conf.redis;
-import by.testtask.balancehub.domain.Transfer;
+import by.testtask.balancehub.domain.TransferDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -11,11 +13,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate<String, Transfer> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Transfer> template = new RedisTemplate<>();
+    public RedisTemplate<String, TransferDTO> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, TransferDTO> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+
         return template;
     }
 

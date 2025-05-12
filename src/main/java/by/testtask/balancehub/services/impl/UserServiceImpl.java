@@ -4,7 +4,7 @@ import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
 import by.testtask.balancehub.dto.common.UserSearchType;
-import by.testtask.balancehub.dto.elasticsearch.UserIndex;
+import by.testtask.balancehub.dto.elasticsearch.UserIndexDTO;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
@@ -172,7 +172,7 @@ public class UserServiceImpl implements UserService {
 
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
 
-        UserIndex index = userMapper.toUserIndex(currentUser);
+        UserIndexDTO index = userMapper.toUserIndex(currentUser);
 
         eventPublisher.publishEvent(new Events.UserChangedEvent(index));
     }

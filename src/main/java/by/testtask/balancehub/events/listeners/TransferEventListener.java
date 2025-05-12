@@ -1,5 +1,5 @@
 package by.testtask.balancehub.events.listeners;
-import by.testtask.balancehub.domain.Transfer;
+import by.testtask.balancehub.dto.redis.TransferDTO;
 import by.testtask.balancehub.events.Events;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -13,20 +13,20 @@ import static by.testtask.balancehub.utils.Constants.TRANSFER_QUEUE_NAME;
 @Component
 @RequiredArgsConstructor
 public class TransferEventListener {
-    private final RedisTemplate<String, Transfer> redisTemplate;
+    private final RedisTemplate<String, TransferDTO> redisTemplate;
 
     @EventListener
     public void handleTransferEvent(Events.TransferEvent event) {
-        Transfer transfer = event.transfer();
-        System.out.println("Transfer Event Received: " + transfer);
-        redisTemplate.opsForList().leftPush(TRANSFER_QUEUE_NAME, transfer);
+        TransferDTO transferDTO = event.transferDTO();
+        System.out.println("TransferDTO Event Received: " + transferDTO);
+        redisTemplate.opsForList().leftPush(TRANSFER_QUEUE_NAME, transferDTO);
     }
 
     @EventListener
     public void handleTransferConfirmedEvent(Events.TransferConfirmed event) {
-        Transfer transfer = event.transfer();
-        System.out.println("Transfer Confirmed Event Received: " + transfer);
-        redisTemplate.opsForList().leftPush(CONFIRMED_TRANSFER_QUEUE_NAME, transfer);
+        TransferDTO transferDTO = event.transferDTO();
+        System.out.println("TransferDTO Confirmed Event Received: " + transferDTO);
+        redisTemplate.opsForList().leftPush(CONFIRMED_TRANSFER_QUEUE_NAME, transferDTO);
     }
 
 }

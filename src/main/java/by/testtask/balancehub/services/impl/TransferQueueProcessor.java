@@ -1,5 +1,5 @@
 package by.testtask.balancehub.services.impl;
-import by.testtask.balancehub.domain.Transfer;
+import by.testtask.balancehub.dto.redis.TransferDTO;
 import by.testtask.balancehub.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,21 +16,22 @@ import static by.testtask.balancehub.utils.Constants.TRANSFER_QUEUE_NAME;
 @RequiredArgsConstructor
 public class TransferQueueProcessor {
     private final AccountService accountService;
-    private final RedisTemplate<String, Transfer> redisTemplate;
+    private final RedisTemplate<String, TransferDTO> redisTemplate;
 
 
+    //TODO
     @Scheduled(fixedRate = 5000)
     public void processQueue() {
-        Transfer transfer = redisTemplate.opsForList().rightPop(TRANSFER_QUEUE_NAME);
-        if (Objects.nonNull(transfer)) {
-            System.out.println("Processing transfer from queue: " + transfer);
-            accountService.makeTransfer(transfer);
+        TransferDTO transferDTO = redisTemplate.opsForList().rightPop(TRANSFER_QUEUE_NAME);
+        if (Objects.nonNull(transferDTO)) {
+            System.out.println("Processing transferDTO from queue: " + transferDTO);
+            accountService.makeTransfer(transferDTO);
         }
 
-        Transfer confirmedTransfer = redisTemplate.opsForList().rightPop(CONFIRMED_TRANSFER_QUEUE_NAME);
-        if (Objects.nonNull(confirmedTransfer)) {
+        TransferDTO confirmedTransferDTO = redisTemplate.opsForList().rightPop(CONFIRMED_TRANSFER_QUEUE_NAME);
+        if (Objects.nonNull(confirmedTransferDTO)) {
             //Тут можно слать уведомления юзеру или еще что-то
-            System.out.println("Processing confirmed transfer from queue: " + confirmedTransfer);
+            System.out.println("Processing confirmed transferDTO from queue: " + confirmedTransferDTO);
         }
     }
 }

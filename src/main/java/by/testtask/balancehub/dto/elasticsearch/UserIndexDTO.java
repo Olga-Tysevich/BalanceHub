@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserIndex {
+public class UserIndexDTO {
     @Id
     private Long id;
 
