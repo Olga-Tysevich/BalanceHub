@@ -49,15 +49,10 @@ class BalanceSchedulerTest extends BaseTest {
 
     @Test
     void testIncreaseBalanceUpToLimit() {
-        User user = new User();
-        user.setId(1L);
 
-        Account account = Account.builder()
-                .id(1L)
-                .user(user)
-                .balance(new BigDecimal("100.00"))
-                .initialBalance(new BigDecimal("100.00"))
-                .build();
+        Account account = accountRepo.findById(1L).get();
+        account.setBalance(new BigDecimal("100.00"));
+        account.setInitialBalance(new BigDecimal("100.00"));
 
         when(accountRepo.findAll()).thenReturn(List.of(account));
         when(userMapper.toUserIndex(any())).thenReturn(new UserIndexDTO());
@@ -78,12 +73,9 @@ class BalanceSchedulerTest extends BaseTest {
         User user = new User();
         user.setId(2L);
 
-        Account account = Account.builder()
-                .id(2L)
-                .user(user)
-                .balance(new BigDecimal("300.00"))
-                .initialBalance(new BigDecimal("100.00"))
-                .build();
+        Account account = accountRepo.findById(1L).get();
+        account.setBalance(new BigDecimal("300.00"));
+        account.setInitialBalance(new BigDecimal("100.00"));
 
         when(accountRepo.findAll()).thenReturn(List.of(account));
 
@@ -97,12 +89,9 @@ class BalanceSchedulerTest extends BaseTest {
         User user = new User();
         user.setId(3L);
 
-        Account account = Account.builder()
-                .id(3L)
-                .user(user)
-                .balance(new BigDecimal("50.00"))
-                .initialBalance(BigDecimal.ZERO)
-                .build();
+        Account account = accountRepo.findById(3L).get();
+        account.setBalance(new BigDecimal("100.00"));
+        account.setInitialBalance(BigDecimal.ZERO);
 
         when(accountRepo.findAll()).thenReturn(List.of(account));
         when(userMapper.toUserIndex(any())).thenReturn(new UserIndexDTO());
