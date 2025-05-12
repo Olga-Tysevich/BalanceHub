@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -61,6 +62,7 @@ public class AccountServiceImpl implements AccountService {
         return account.getId();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void makeTransfer(TransferDTO transferDTO) {
         Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
@@ -150,13 +152,15 @@ public class AccountServiceImpl implements AccountService {
         BigDecimal transferAmount = moneyTransferReq.getAmount();
         BigDecimal newAccountFromAmount = moneyTransferReq.getAmount().subtract(transferAmount);
         fromAccount.setHold(transferAmount);
-        toAccount.setBalance(newAccountFromAmount);
+        fromAccount.setBalance(newAccountFromAmount);
         accountRepo.save(fromAccount);
 
         Transfer transfer = Transfer.builder()
-                .createdAt(LocalDateTime.now())
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
+                .amount(amount)
+                .status(TransferStatus.PENDING)
+                .confirmedAt(LocalDateTime.now())
                 .build();
         transferRepo.save(transfer);
 

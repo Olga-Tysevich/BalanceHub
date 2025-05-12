@@ -20,7 +20,7 @@ public interface TransferMapper {
 
     @Mappings({
             @Mapping(target = "fromAccount", ignore = true),
-            @Mapping(target = "toAccount", ignore = true)
+            @Mapping(target = "toAccount", ignore = true),
     })
     Transfer toEntity(TransferDTO transferDTO);
 

@@ -37,4 +37,7 @@ public class TransferDTO {
     private LocalDateTime confirmedAt;
     @NotNull(message = TRANSFER_STATUS_CANNOT_BE_NUL)
     private TransferStatus status;
+    @NotNull(message = VERSION_CANNOT_BE_NULL)
+    @Builder.Default
+    private Long version = 1L;
 }

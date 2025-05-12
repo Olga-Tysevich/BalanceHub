@@ -1,5 +1,5 @@
 package by.testtask.balancehub.conf.redis;
-import by.testtask.balancehub.domain.TransferDTO;
+import by.testtask.balancehub.dto.redis.TransferDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;

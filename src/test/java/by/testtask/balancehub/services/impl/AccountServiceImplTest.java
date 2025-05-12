@@ -17,7 +17,7 @@ import static by.testtask.balancehub.utils.TestConstants.USERNAME_1_PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-class AccountServiceIntegrationTest extends BaseTest {
+class AccountServiceImplTest extends BaseTest {
 
     @Autowired
     private AccountRepo accountRepo;
