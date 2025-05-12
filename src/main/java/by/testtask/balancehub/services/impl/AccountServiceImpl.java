@@ -81,7 +81,7 @@ public class AccountServiceImpl implements AccountService {
             transferDTO.setStatus(TransferStatus.CONFIRMED);
             transferDTO.setConfirmedAt(LocalDateTime.now());
 
-            Transfer transfer = transferMapper.toEntity(transferDTO);
+            Transfer transfer = transferRepo.findById(transferDTO.getId()).orElseThrow();
             transfer.setFromAccount(fromAccount);
             transfer.setToAccount(toAccount);
             transfer.setStatus(TransferStatus.CONFIRMED);
