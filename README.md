@@ -23,7 +23,8 @@ Simple banking system with user accounts, balance updates and secure money trans
    Create a .env file in the tracker directory based on .env-example. 
    Generate JWT keys (for example, using - https://jwt-keys.21no.de/), specify the expiration time of the keys, and fill in your database paths and credentials.
 
-2. Run the Databases
+2. Set up .env like .env-example
+3. Run the Databases
    Navigate to the tracker directory and run the following command to start the databases:
 
    docker-compose up --build balancehub_db
@@ -40,4 +41,4 @@ Simple banking system with user accounts, balance updates and secure money trans
 
    docker-compose up --build app
 
-3. The service is accessible at the URL: http://localhost:8080
+4. The service is accessible at the URL: http://localhost:8080
