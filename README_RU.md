@@ -23,21 +23,22 @@
    Создайте файл .env в каталоге трекера на основе .env-example.
    Сгенерируйте ключи JWT (например, с помощью - https://jwt-keys.21no.de/), укажите срок действия ключей и заполните пути к базе данных и учетные данные.
 
-2. Запустите базы данных
+2. Настройте .env по образцу .env-example
+3. Запустите базы данных
    Перейдите в каталог трекера и выполните следующую команду для запуска баз данных:
 
-docker-compose up --build balancehub_db
+   docker-compose up --build balancehub_db
 
-Выполните следующую команду для запуска elastichsearch:
+   Выполните следующую команду для запуска elastichsearch:
 
-docker-compose up --build elasticsearch
+   docker-compose up --build elasticsearch
 
-Выполните следующую команду для запуска redis:
+   Выполните следующую команду для запуска redis:
 
-docker-compose up --build redis
+   docker-compose up --build redis
 
-Выполните следующую команду для запуска приложения:
+   Выполните следующую команду для запуска приложения:
 
-docker-compose up --build app
+   docker-compose up --build app
 
-3. Служба доступна по URL-адресу: http://localhost:8080
+4. Служба доступна по URL-адресу: http://localhost:8080
