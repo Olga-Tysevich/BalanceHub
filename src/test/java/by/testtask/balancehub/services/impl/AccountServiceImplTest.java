@@ -40,6 +40,9 @@ class AccountServiceImplTest extends BaseTest {
         Account toAccount = accountRepo.findById(2L).get();
         toAccount.setBalance(BigDecimal.ZERO);
 
+        accountRepo.save(fromAccount);
+        accountRepo.save(toAccount);
+
         MoneyTransferReq transfer = new MoneyTransferReq();
         transfer.setFromAccountId(fromAccount.getId());
         transfer.setToAccountId(toAccount.getId());
@@ -48,13 +51,19 @@ class AccountServiceImplTest extends BaseTest {
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
         accountService.createTransfer(transfer);
 
+        fromAccount = accountRepo.findById(1L).get();
+
+        assertThat(fromAccount.getHold()).isEqualTo(new BigDecimal("50.00"));
+        assertThat(fromAccount.getBalance()).isEqualTo(new BigDecimal("150.00"));
+
         transferQueueProcessor.processQueue();
 
-        fromAccount = accountRepo.findById(1L).get();
-        toAccount = accountRepo.findById(2L).get();
+//        toAccount = accountRepo.findById(2L).get();
 
         assertThat(toAccount.getBalance()).isEqualTo(new BigDecimal("50.00"));
         assertThat(fromAccount.getHold()).isEqualTo(new BigDecimal("50.00"));
+        assertThat(fromAccount.getBalance()).isEqualTo(new BigDecimal("150.00"));
+
 
     }
 }

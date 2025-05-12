@@ -39,5 +39,5 @@ public class TransferDTO {
     private TransferStatus status;
     @NotNull(message = VERSION_CANNOT_BE_NULL)
     @Builder.Default
-    private Long version = 1L;
+    private Long version = 0L;
 }

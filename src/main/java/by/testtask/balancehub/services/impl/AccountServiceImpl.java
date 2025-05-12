@@ -82,8 +82,10 @@ public class AccountServiceImpl implements AccountService {
             transferDTO.setConfirmedAt(LocalDateTime.now());
 
             Transfer transfer = transferMapper.toEntity(transferDTO);
+            transfer.setFromAccount(fromAccount);
+            transfer.setToAccount(toAccount);
             transfer.setStatus(TransferStatus.CONFIRMED);
-            transfer.setConfirmedAt(LocalDateTime.now());
+            transfer.setConfirmedAt(transferDTO.getConfirmedAt());
 
             transferRepo.save(transfer);
 
@@ -150,7 +152,7 @@ public class AccountServiceImpl implements AccountService {
         Account toAccount = toAccountOpt.get();
 
         BigDecimal transferAmount = moneyTransferReq.getAmount();
-        BigDecimal newAccountFromAmount = moneyTransferReq.getAmount().subtract(transferAmount);
+        BigDecimal newAccountFromAmount = fromAccount.getBalance().subtract(transferAmount);
         fromAccount.setHold(transferAmount);
         fromAccount.setBalance(newAccountFromAmount);
         accountRepo.save(fromAccount);
@@ -160,7 +162,7 @@ public class AccountServiceImpl implements AccountService {
                 .toAccount(toAccount)
                 .amount(amount)
                 .status(TransferStatus.PENDING)
-                .confirmedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
         transferRepo.save(transfer);
 
