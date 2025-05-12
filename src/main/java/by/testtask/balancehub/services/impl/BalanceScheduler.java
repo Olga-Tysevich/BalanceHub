@@ -44,10 +44,8 @@ public class BalanceScheduler {
 
             if (currentBalance.compareTo(maxIncreaseBalance) > 0) continue;
 
-            if (BigDecimal.ZERO.compareTo(maxIncreaseBalance) == 0 && BigDecimal.ZERO.compareTo(currentBalance) < 0) {
-
-                initialBalance = account.getBalance();
-                account.setInitialBalance(initialBalance);
+            if (initialBalance.compareTo(BigDecimal.ZERO) == 0 && currentBalance.compareTo(BigDecimal.ZERO) > 0) {
+                account.setInitialBalance(currentBalance);
                 saveAccount(account);
                 continue;
             }
