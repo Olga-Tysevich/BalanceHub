@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "BY_NAME": {
+      "$ref": "#/definitions/SearchBlock"
+    },
+    "BY_EMAIL": {
+      "$ref": "#/definitions/SearchBlock"
+    },
+    "BY_PHONE": {
+      "$ref": "#/definitions/SearchBlock"
+    },
+    "BY_BIRTHDAY": {
+      "$ref": "#/definitions/SearchBlock"
+    },
+    "BY_ALL": {
+      "$ref": "#/definitions/SearchBlock"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "BY_NAME"
+      ]
+    },
+    {
+      "required": [
+        "BY_EMAIL"
+      ]
+    },
+    {
+      "required": [
+        "BY_PHONE"
+      ]
+    },
+    {
+      "required": [
+        "BY_BIRTHDAY"
+      ]
+    },
+    {
+      "required": [
+        "BY_ALL"
+      ]
+    }
+  ],
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "pattern": "^\\d{2}\\.\\d{2}\\.\\d{4}$"
+        },
+        "phones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "phone": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "phone"
+            ]
+          }
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
+            },
+            "required": [
+              "id",
+              "email"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "dateOfBirth",
+        "phones",
+        "emails"
+      ]
+    },
+    "SearchBlock": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "page": {
+          "type": "integer"
+        },
+        "totalPages": {
+          "type": "integer"
+        },
+        "totalUsers": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "users"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
