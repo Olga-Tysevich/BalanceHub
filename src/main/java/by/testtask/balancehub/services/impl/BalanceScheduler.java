@@ -6,9 +6,11 @@ import by.testtask.balancehub.events.Events;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.AccountRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BalanceScheduler {
@@ -64,16 +67,20 @@ public class BalanceScheduler {
     }
 
     private void saveAccount(Account account) {
-        accountRepo.save(account);
+        try {
+            accountRepo.save(account);
 
-        User user = account.getUser();
-        Long userId = user.getId();
-        UserIndexDTO index = userMapper.toUserIndex(user);
+            User user = account.getUser();
+            Long userId = user.getId();
+            UserIndexDTO index = userMapper.toUserIndex(user);
 
-        Optional.ofNullable(cacheManager.getCache("users"))
-                .ifPresent(cache -> cache.evict(userId));
+            Optional.ofNullable(cacheManager.getCache("users"))
+                    .ifPresent(cache -> cache.evict(userId));
 
-        eventPublisher.publishEvent(new Events.UserChangedEvent(index));
+            eventPublisher.publishEvent(new Events.UserChangedEvent(index));
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.error("Error saving account with id {}. Cause: {}", account.getId(), e.getMessage());
+        }
     }
 
 }
