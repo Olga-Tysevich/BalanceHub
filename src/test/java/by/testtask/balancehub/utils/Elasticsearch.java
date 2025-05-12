@@ -24,7 +24,6 @@ public class Elasticsearch {
 
     static {
         container.start();
-        System.out.println(container.getLogs());
     }
 
     public static String getElasticsearchUrl() {
