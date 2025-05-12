@@ -20,7 +20,7 @@ Simple banking system with user accounts, balance updates and secure money trans
 1. Clone the Repository
    git clone -b master git@github.com:Olga-Tysevich/BalanceHub.git
    Ensure that the project branch is new_version!!!
-   Create a .env file in the tracker directory based on .env-example. 
+   Create a .env file in the tracker directory based on .env-example.
    Generate JWT keys (for example, using - https://jwt-keys.21no.de/), specify the expiration time of the keys, and fill in your database paths and credentials.
 
 2. Set up .env like .env-example
