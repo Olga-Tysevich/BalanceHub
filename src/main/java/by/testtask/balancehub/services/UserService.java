@@ -1,5 +1,6 @@
 package by.testtask.balancehub.services;
 
+import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
@@ -26,6 +27,8 @@ public interface UserService {
     Long deleteEmail(@NotNull Long emailId);
 
     Long deletePhone(@NotNull Long phoneId);
+
+    UserDTO findUserById(@NotNull Long id);
 
     Map<UserSearchType, UserPageResp> find(@NotNull UserSearchReq request);
 }

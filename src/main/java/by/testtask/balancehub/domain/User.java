@@ -56,6 +56,11 @@ public class User implements UserDetails {
     @CollectionSize(message = EMPTY_EMAIL_SET)
     private Set<EmailData> emails;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Account account;
+
     @Transient
     private final Set<GrantedAuthority> roleSet = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
 

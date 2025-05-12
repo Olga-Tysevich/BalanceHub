@@ -1,6 +1,6 @@
 package by.testtask.balancehub.events.listeners;
 
-import by.testtask.balancehub.dto.elasticsearch.UserIndex;
+import by.testtask.balancehub.dto.elasticsearch.UserIndexDTO;
 import by.testtask.balancehub.events.Events;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class UserChangedEventListener {
 
     @EventListener
     public void onUserChanged(Events.UserChangedEvent event) {
-        UserIndex index = event.index();
+        UserIndexDTO index = event.index();
 
         try {
             elasticsearchClient.index(i -> i

@@ -22,6 +22,11 @@ public class DotenvLoader {
         System.setProperty("BALANCE_HUB_DB_USER", Objects.requireNonNull(dotenv.get("BALANCE_HUB_DB_USER")));
         System.setProperty("BALANCE_HUB_DB_PASSWORD", Objects.requireNonNull(dotenv.get("BALANCE_HUB_DB_PASSWORD")));
 
+        System.setProperty("REDIS_HOST", Objects.requireNonNull(dotenv.get("REDIS_HOST")));
+        System.setProperty("REDIS_PASSWORD", Objects.requireNonNull(dotenv.get("REDIS_PASSWORD")));
+        System.setProperty("REDIS_PORT", Objects.requireNonNull(dotenv.get("REDIS_PORT")));
+        System.setProperty("REDIS_PORT_EPORT", Objects.requireNonNull(dotenv.get("REDIS_PORT_EPORT")));
+
         System.setProperty("BALANCE_HUB_WEB_ALLOWED_SOURCES", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_ALLOWED_SOURCES")));
         System.setProperty("BALANCE_HUB_WEB_ALLOWED_METHODS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_ALLOWED_METHODS")));
         System.setProperty("BALANCE_HUB_WEB_ALLOWED_HEADERS", Objects.requireNonNull(dotenv.get("BALANCE_HUB_WEB_ALLOWED_HEADERS")));

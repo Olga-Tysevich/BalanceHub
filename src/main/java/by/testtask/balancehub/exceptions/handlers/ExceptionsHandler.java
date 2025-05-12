@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeException;
@@ -25,14 +26,16 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ExceptionsHandler {
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({
+            AccessDeniedException.class,
+            ProhibitedException.class
+    })
     public ResponseEntity<?> accessExceptions(AccessDeniedException e) {
         return buildExceptionResponse(HttpStatus.FORBIDDEN, e);
     }
 
     @ExceptionHandler({
             HttpMediaTypeException.class,
-            PasswordMismatchException.class,
             HttpMessageNotReadableException.class,
             MissingRequestCookieException.class,
             MissingRequestHeaderException.class,
@@ -54,7 +57,8 @@ public class ExceptionsHandler {
 
     @ExceptionHandler({
             EmailAlreadyInUse.class,
-            PhoneAlreadyInUse.class
+            PhoneAlreadyInUse.class,
+            AccountAlreadyExists.class
     })
     public ResponseEntity<?> conflictExceptions(Exception e) {
         return buildExceptionResponse(HttpStatus.CONFLICT, e);
@@ -62,7 +66,8 @@ public class ExceptionsHandler {
 
     @ExceptionHandler({
             UnauthorizedException.class,
-            InvalidRefreshTokenException.class
+            InvalidRefreshTokenException.class,
+            AuthenticationCredentialsNotFoundException.class
     })
     public ResponseEntity<?> unauthorizedExceptions(Exception e) {
         return buildExceptionResponse(HttpStatus.UNAUTHORIZED, e);

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -40,6 +41,8 @@ public class UserDTO {
     @CollectionSize(message = EMPTY_PHONE_SET)
     private Set<InnerEmailData> emails;
 
+    private InnerAccountData account;
+
 
     @Data
     @AllArgsConstructor
@@ -55,6 +58,14 @@ public class UserDTO {
     public static class InnerEmailData {
         private Long id;
         private String email;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class InnerAccountData {
+        private Long id;
+        private BigDecimal balance;
     }
 
 }

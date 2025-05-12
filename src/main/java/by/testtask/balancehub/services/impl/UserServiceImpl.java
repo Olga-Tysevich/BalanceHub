@@ -3,23 +3,28 @@ package by.testtask.balancehub.services.impl;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
+import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
-import by.testtask.balancehub.dto.elasticsearch.UserIndex;
+import by.testtask.balancehub.dto.elasticsearch.UserIndexDTO;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.events.Events;
 import by.testtask.balancehub.exceptions.EmailAlreadyInUse;
+import by.testtask.balancehub.exceptions.PhoneAlreadyInUse;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.EmailDataRepo;
 import by.testtask.balancehub.repos.PhoneDataRepo;
+import by.testtask.balancehub.repos.UserRepo;
 import by.testtask.balancehub.services.UserSearchService;
 import by.testtask.balancehub.services.UserService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +33,14 @@ import java.util.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_USER')")
 public class UserServiceImpl implements UserService {
     private final EmailDataRepo emailDataRepo;
     private final PhoneDataRepo phoneDataRepo;
     private final ApplicationEventPublisher eventPublisher;
     private final UserSearchService userSearchService;
     private final UserMapper userMapper;
+    private final UserRepo userRepo;
+    private final CacheManager cacheManager;
 
     @Override
     public Long addEmail(String email) {
@@ -42,16 +48,19 @@ public class UserServiceImpl implements UserService {
 
         emailDataRepo.save(emailData);
         publishEvent();
+        addToCache(emailData);
 
         return emailData.getUser().getId();
     }
 
     @Override
+    @CachePut(value = "users", key = "#id")
     public Long addPhone(String phone) {
         PhoneData phoneData = createPhone(phone);
 
         phoneDataRepo.save(phoneData);
         publishEvent();
+        addToCache(phoneData);
 
         return phoneData.getUser().getId();
     }
@@ -63,6 +72,7 @@ public class UserServiceImpl implements UserService {
         emailData.setId(oldEmailId);
         emailDataRepo.save(emailData);
         publishEvent();
+        addToCache(emailData);
 
         return emailData.getUser().getId();
     }
@@ -74,6 +84,7 @@ public class UserServiceImpl implements UserService {
         phoneData.setId(oldPhoneId);
         phoneDataRepo.save(phoneData);
         publishEvent();
+        addToCache(phoneData);
 
         return phoneData.getUser().getId();
     }
@@ -83,12 +94,35 @@ public class UserServiceImpl implements UserService {
         Long userId = PrincipalExtractor.getCurrentUserId();
 
         if (!emailDataRepo.existsByIdAndUserId(emailId, userId))
-            throw new AccessDeniedException("The current index is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
+            throw new AccessDeniedException("The current user is not allowed to modify this email. User id: " + userId + ", email id: " + emailId);
 
         emailDataRepo.deleteById(emailId);
         publishEvent();
+        clearCache(userId);
 
         return userId;
+    }
+
+    @Override
+    public Long deletePhone(Long phoneId) {
+        Long userId = PrincipalExtractor.getCurrentUserId();
+
+        if (!phoneDataRepo.existsByIdAndUserId(phoneId, userId))
+            throw new AccessDeniedException("The current user is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
+
+        phoneDataRepo.deleteById(phoneId);
+        publishEvent();
+        clearCache(userId);
+
+        return userId;
+    }
+
+    @Override
+    @Cacheable(value = "users", key = "#id")
+    public UserDTO findUserById(Long id) {
+        return userRepo.findById(id)
+                .map(userMapper::toUserDTO)
+                .orElseGet(() -> null);
     }
 
     @Override
@@ -118,19 +152,6 @@ public class UserServiceImpl implements UserService {
         return users;
     }
 
-    @Override
-    public Long deletePhone(Long phoneId) {
-        Long userId = PrincipalExtractor.getCurrentUserId();
-
-        if (!phoneDataRepo.existsByIdAndUserId(phoneId, userId))
-            throw new AccessDeniedException("The current index is not allowed to modify this phone. User id: " + userId + ", email id: " + phoneId);
-
-        phoneDataRepo.deleteById(phoneId);
-        publishEvent();
-
-        return userId;
-    }
-
     private EmailData createEmail(String email) {
         User currentUser = PrincipalExtractor.getCurrentUser();
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
@@ -153,7 +174,7 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
 
         if (currentUser.isContainsPhone(phone))
-            throw new EmailAlreadyInUse(phone, "Phone has already been added for the current with id: " + currentUser.getId());
+            throw new PhoneAlreadyInUse(phone, "Phone has already been added for the current with id: " + currentUser.getId());
 
 
         Long currentUserId = currentUser.getId();
@@ -171,9 +192,31 @@ public class UserServiceImpl implements UserService {
 
         if (Objects.isNull(currentUser)) throw new UnauthorizedException();
 
-        UserIndex index = userMapper.toUserIndex(currentUser);
+        UserIndexDTO index = userMapper.toUserIndex(currentUser);
 
         eventPublisher.publishEvent(new Events.UserChangedEvent(index));
+    }
+
+    private void addToCache(PhoneData phoneData) {
+        Long userId = phoneData.getUser().getId();
+        UserDTO userDTO = userMapper.toUserDTO(phoneData.getUser());
+
+        Optional.ofNullable(cacheManager.getCache("users"))
+                .ifPresent(cache -> cache.put(userId, userDTO));
+    }
+
+
+    private void addToCache(EmailData emailData) {
+        Long userId = emailData.getUser().getId();
+        UserDTO userDTO = userMapper.toUserDTO(emailData.getUser());
+
+        Optional.ofNullable(cacheManager.getCache("users"))
+                .ifPresent(cache -> cache.put(userId, userDTO));
+    }
+
+    private void clearCache(Long userId) {
+        Optional.ofNullable(cacheManager.getCache("users"))
+                .ifPresent(cache -> cache.evict(userId));
     }
 
 }

@@ -6,6 +6,7 @@ import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.exceptions.EmailAlreadyInUse;
+import by.testtask.balancehub.exceptions.PhoneAlreadyInUse;
 import by.testtask.balancehub.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class UserServiceImplTest extends BaseTest {
     void addPhone_alreadyInUse_fails() {
         String phone = USERNAME_1_PHONE_LIST.getFirst();
 
-        assertThrows(EmailAlreadyInUse.class, () -> userService.addPhone(phone));
+        assertThrows(PhoneAlreadyInUse.class, () -> userService.addPhone(phone));
     }
 
     @Test
@@ -239,4 +240,6 @@ class UserServiceImplTest extends BaseTest {
         assertNotNull(userSet);
         assertEquals(6, userSet.size());
     }
+
+
 }
