@@ -33,3 +33,5 @@ build/
 .vscode/
 /.env
 /src/main/java/by/testtask/balancehub/utils/PasswordUtils.java
+/src/main/java/by/testtask/balancehub/controllers/LogTestController.java
+/logs/

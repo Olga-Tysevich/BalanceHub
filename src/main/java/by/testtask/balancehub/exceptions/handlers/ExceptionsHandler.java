@@ -2,6 +2,7 @@ package by.testtask.balancehub.exceptions.handlers;
 
 import by.testtask.balancehub.exceptions.*;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionsHandler {
 
@@ -75,6 +77,7 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> validationExceptions(MethodArgumentNotValidException e) {
+        log.error("Validation Failed: {}", e.getMessage(), e);
         BindingResult result = e.getBindingResult();
         List<ErrorDetail> errorDetails = result.getFieldErrors().stream()
                 .map(fieldError -> new ErrorDetail(fieldError.getField(), fieldError.getDefaultMessage()))
@@ -85,10 +88,14 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> internalServerError(Exception e) {
+        log.error("Internal Server Error: {}", e.getMessage(), e);
         return buildExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
     private ResponseEntity<Object> buildExceptionResponse(HttpStatus status, Exception e) {
+        log.error("Exception occurred: {} - Status: {} - Message: {}",
+                e.getClass().getSimpleName(), status, e.getMessage(), e);
+
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 status.value(),
                 e.getMessage(),
