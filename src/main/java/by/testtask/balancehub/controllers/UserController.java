@@ -60,8 +60,8 @@ public class UserController {
         return ResponseEntity.ok(Map.of("userId", userId));
     }
 
-    @GetMapping("/find")
-    public ResponseEntity<UserDTO> findById(@RequestParam @NotNull Long userId) {
+    @GetMapping("/find/{userId}")
+    public ResponseEntity<UserDTO> findById(@PathVariable @NotNull Long userId) {
         UserDTO result = userService.findUserById(userId);
         return ResponseEntity.ok(result);
     }
