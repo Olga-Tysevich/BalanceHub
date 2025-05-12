@@ -12,6 +12,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserSearchServiceImpl implements UserSearchService {
@@ -72,6 +74,11 @@ public class UserSearchServiceImpl implements UserSearchService {
     }
 
     private UserPageResp createRequest(List<Query> queries, int page, int size) {
+
+        log.info("Creating request for users with page: {}, size: {}", page, size);
+
+        log.debug("Queries being used for search: {}", queries);
+
         SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index("users")
                 .query(q -> q.bool(b -> b.must(queries)))
@@ -80,15 +87,22 @@ public class UserSearchServiceImpl implements UserSearchService {
         );
 
         try {
+            log.info("Sending search request to Elasticsearch...");
+
             SearchResponse<UserIndexDTO> response = elasticsearchClient.search(searchRequest, UserIndexDTO.class);
 
             Set<UserIndexDTO> users = response.hits().hits().stream()
                     .map(Hit::source)
                     .collect(Collectors.toSet());
+
+            log.debug("Found {} users in the search result", users.size());
+
             Set<UserDTO> t = users.stream().map(userMapper::toUserDTO).collect(Collectors.toSet());
 
             int totalHits = Objects.nonNull(response.hits().total()) ? (int) response.hits().total().value() : 0;
             int totalPages = (int) Math.ceil((double) totalHits / size);
+
+            log.info("Total hits: {}, Total pages: {}", totalHits, totalPages);
 
             return UserPageResp.builder()
                     .users(t)
@@ -97,8 +111,7 @@ public class UserSearchServiceImpl implements UserSearchService {
                     .totalUsers(totalHits)
                     .build();
         } catch (IOException e) {
-            // TODO лог
-            System.out.println(e.getMessage());
+            log.error("Error occurred while querying Elasticsearch: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

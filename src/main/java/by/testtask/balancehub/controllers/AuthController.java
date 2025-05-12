@@ -3,6 +3,10 @@ package by.testtask.balancehub.controllers;
 import by.testtask.balancehub.dto.req.UserLoginDTO;
 import by.testtask.balancehub.dto.resp.LoggedUserDTO;
 import by.testtask.balancehub.services.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,17 @@ import static by.testtask.balancehub.utils.Constants.TOKEN_TYPE;
 public class AuthController {
     private final AuthService authService;
 
+    @Operation(
+            summary = "Login a user",
+            description = "Authenticates the user with the provided credentials " +
+                    "(email or phone and password) and returns the logged-in user data along with a refresh token in a cookie."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "User logged in successfully",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = LoggedUserDTO.class))
+    )
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO req) {
         LoggedUserDTO respBody = authService.loginUser(req);
@@ -39,6 +54,14 @@ public class AuthController {
                 .body(respBody);
     }
 
+    @Operation(
+            summary = "Logout the user",
+            description = "Logs out the user by clearing the refresh token cookie."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "User logged out successfully"
+    )
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_KEY, "")

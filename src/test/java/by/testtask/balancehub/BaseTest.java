@@ -81,4 +81,7 @@ public class BaseTest {
         SecurityContextHolder.clearContext();
     }
 
+    @Test
+    public void test() {}
+
 }

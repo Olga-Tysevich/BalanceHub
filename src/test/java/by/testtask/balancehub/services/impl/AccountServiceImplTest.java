@@ -7,6 +7,7 @@ import by.testtask.balancehub.domain.TransferStatus;
 import by.testtask.balancehub.dto.common.AccountDTO;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
 import by.testtask.balancehub.exceptions.ProhibitedException;
+import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.repos.AccountRepo;
 import by.testtask.balancehub.repos.TransferRepo;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
@@ -97,7 +97,7 @@ class AccountServiceImplTest extends BaseTest {
         req.setAmount(BigDecimal.TEN);
 
         assertThatThrownBy(() -> accountService.createTransfer(req))
-                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test
