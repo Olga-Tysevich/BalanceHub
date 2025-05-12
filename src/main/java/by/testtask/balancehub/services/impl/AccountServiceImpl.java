@@ -115,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void createTransfer(MoneyTransferReq moneyTransferReq) {
+    public Long createTransfer(MoneyTransferReq moneyTransferReq) {
 
         User currentUser = PrincipalExtractor.getCurrentUser();
 
@@ -171,6 +171,8 @@ public class AccountServiceImpl implements AccountService {
         Events.TransferEvent transferEvent = new Events.TransferEvent(transferDTO);
 
         eventPublisher.publishEvent(transferEvent);
+
+        return transfer.getId();
     }
 
 

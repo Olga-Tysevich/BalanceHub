@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeException;
@@ -65,7 +66,8 @@ public class ExceptionsHandler {
 
     @ExceptionHandler({
             UnauthorizedException.class,
-            InvalidRefreshTokenException.class
+            InvalidRefreshTokenException.class,
+            AuthenticationCredentialsNotFoundException.class
     })
     public ResponseEntity<?> unauthorizedExceptions(Exception e) {
         return buildExceptionResponse(HttpStatus.UNAUTHORIZED, e);
