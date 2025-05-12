@@ -41,5 +41,6 @@ public interface Constants {
     String TRANSFER_AMOUNT_BE_POSITIVE = "Hold balance must be positive!";
     String ACCOUNT_CANNOT_BE_NULL = "Account must be specified";
     String VERSION_CANNOT_BE_NULL = "Version must be specified";
+    String INITIAL_BALANCE_MUST_BE_POSITIVE = "Initial balance must be positive or zero!";
 
 }

@@ -6,6 +6,7 @@ import by.testtask.balancehub.dto.resp.UserPageResp;
 import by.testtask.balancehub.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +57,12 @@ public class UserController {
     public ResponseEntity<?> deletePhone(@RequestBody @Valid DeletePhoneRequest req) {
         Long userId = userService.deletePhone(req.phoneId());
         return ResponseEntity.ok(Map.of("userId", userId));
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<Map<UserSearchType, UserPageResp>> findById(@RequestParam @NotNull Long userId) {
+        Map<UserSearchType, UserPageResp> result = userService.find(req);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/find")

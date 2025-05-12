@@ -43,6 +43,10 @@ public class Account {
     @Builder.Default
     private BigDecimal hold = BigDecimal.ZERO;
 
+    @Column(name = "initial_balance", nullable = false, precision = 19, scale = 2)
+    @DecimalMin(value = "0.00", message = INITIAL_BALANCE_MUST_BE_POSITIVE)
+    private BigDecimal initialBalance = BigDecimal.ZERO;
+
     @Version
     private Long version;
 

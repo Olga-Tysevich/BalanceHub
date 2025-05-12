@@ -20,6 +20,15 @@ import java.util.stream.Collectors;
 public interface UserMapper {
 
     @Mappings({
+            @Mapping(source = "phones", target = "phones", qualifiedByName = "mapPhonesFromEntity"),
+            @Mapping(source = "emails", target = "emails", qualifiedByName = "mapEmailsFromEntity"),
+            @Mapping(source = "account", target = "account", qualifiedByName = "mapAccountFromEntity")
+    })
+    UserDTO toUserDTO(User entity);
+
+    UserDTO userToUserDTO(User user);
+
+    @Mappings({
             @Mapping(target = "phoneNumber", source = "phone"),
             @Mapping(target = "user", ignore = true)
     })
@@ -104,6 +113,28 @@ public interface UserMapper {
         return emails.stream()
                 .map(e -> new UserDTO.InnerEmailData(e.getId(), e.getEmail()))
                 .collect(Collectors.toSet());
+    }
+
+    @Named("mapPhonesFromEntity")
+    default Set<UserDTO.InnerPhoneData> mapPhonesFromEntity(Set<PhoneData> phones) {
+        if (Objects.isNull(phones)) return null;
+        return phones.stream()
+                .map(p -> new UserDTO.InnerPhoneData(p.getId(), p.getPhoneNumber()))
+                .collect(Collectors.toSet());
+    }
+
+    @Named("mapEmailsFromEntity")
+    default Set<UserDTO.InnerEmailData> mapEmailsFromEntity(Set<EmailData> emails) {
+        if (Objects.isNull(emails)) return null;
+        return emails.stream()
+                .map(e -> new UserDTO.InnerEmailData(e.getId(), e.getEmail()))
+                .collect(Collectors.toSet());
+    }
+
+    @Named("mapAccountFromEntity")
+    default UserDTO.InnerAccountData mapAccountFromEntity(Account account) {
+        if (Objects.isNull(account)) return null;
+        return new UserDTO.InnerAccountData(account.getId(), account.getBalance());
     }
 
 }
