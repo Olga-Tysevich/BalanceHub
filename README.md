@@ -19,9 +19,9 @@ Simple banking system with user accounts, balance updates and secure money trans
 ## How to Run
 1. Clone the Repository
    git clone -b master git@github.com:Olga-Tysevich/BalanceHub.git
-   Generate JWT keys (for example, using - https://jwt-keys.21no.de/), specify the expiration time of the keys, and fill in your database paths and credentials.
 
-2. Set up .env like .env-example
+2. Set up .env like .env-example. Generate JWT keys (for example, using - https://jwt-keys.21no.de/), specify the expiration time of the keys, and fill in your database paths and credentials.
+
 3. Run the Databases
    Navigate to the tracker directory and run the following command to start the databases:
 
