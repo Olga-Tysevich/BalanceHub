@@ -1,5 +1,6 @@
 package by.testtask.balancehub.controllers;
 
+import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
 import by.testtask.balancehub.dto.resp.UserPageResp;
@@ -60,8 +61,8 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity<Map<UserSearchType, UserPageResp>> findById(@RequestParam @NotNull Long userId) {
-        Map<UserSearchType, UserPageResp> result = userService.find(req);
+    public ResponseEntity<UserDTO> findById(@RequestParam @NotNull Long userId) {
+        UserDTO result = userService.findUserById(userId);
         return ResponseEntity.ok(result);
     }
 

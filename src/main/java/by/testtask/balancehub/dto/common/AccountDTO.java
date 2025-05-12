@@ -24,4 +24,7 @@ public class AccountDTO {
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
     private BigDecimal balance;
 
+    @NotNull(message = INITIAL_BALANCE_MUST_BE_POSITIVE)
+    private BigDecimal initialBalance;
+
 }
