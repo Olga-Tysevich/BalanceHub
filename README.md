@@ -40,4 +40,4 @@ Simple banking system with user accounts, balance updates and secure money trans
 
    docker-compose up --build app
 
-3. The service is accessible at the URL: http://localhost:8080/api/tracker
+3. The service is accessible at the URL: http://localhost:8080
