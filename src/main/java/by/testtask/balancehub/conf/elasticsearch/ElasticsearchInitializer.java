@@ -9,6 +9,7 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.bulk.IndexOperation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ElasticsearchInitializer {
@@ -33,6 +35,7 @@ public class ElasticsearchInitializer {
     }
 
     private void createIndexIfNotExists() throws IOException {
+        log.info("Checking if 'users' index exists in Elasticsearch...");
         boolean exists = elasticsearchClient.indices().exists(e -> e.index("users")).value();
         if (!exists) {
             elasticsearchClient.indices().create(c -> c
@@ -55,6 +58,7 @@ public class ElasticsearchInitializer {
                             ))
                     )
             );
+            log.info("'users' index created successfully.");
         }
     }
 
@@ -63,12 +67,16 @@ public class ElasticsearchInitializer {
     private void syncAllUsersToElasticsearch() {
         Set<UserIndexDTO> users = transactionTemplate.execute(status -> getAllUsers());
 
-        if (Objects.isNull(users) || users.isEmpty()) return;
+        if (Objects.isNull(users) || users.isEmpty()) {
+            log.warn("No users found to sync with Elasticsearch.");
+            return;
+        }
 
         try {
+            log.info("Preparing bulk operations to sync users to Elasticsearch...");
             List<BulkOperation> operations = users.stream()
                     .map(index -> {
-                        System.out.println("Синхронизация пользователя: " + index);
+                        log.info("Synchronizing user with ID: {}", index.getId());
                         return BulkOperation.of(op -> op
                                 .index(IndexOperation.of(i -> i
                                         .index("users")
@@ -84,17 +92,17 @@ public class ElasticsearchInitializer {
             );
 
             if (response.errors()) {
-                System.err.println("Ошибки при синхронизации пользователей:");
+                log.error("Errors occurred while syncing users to Elasticsearch.");
                 response.items().forEach(item -> {
                     if (item.error() != null) {
-                        System.err.println("Ошибка для ID " + item.id() + ": " + item.error().reason());
+                        log.error("Error for ID {}: {}", item.id(), item.error().reason());
                     }
                 });
             } else {
-                System.out.println("Синхронизировано пользователей в Elasticsearch: " + users.size());
+                log.info("Successfully synced {} users to Elasticsearch.", users.size());
             }
         } catch (IOException e) {
-            System.err.println("Ошибка синхронизации пользователей в Elasticsearch: " + e.getMessage());
+            log.error("Error occurred while syncing users to Elasticsearch: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to sync users to Elasticsearch", e);
         }
     }

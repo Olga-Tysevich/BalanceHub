@@ -18,7 +18,6 @@ public class ApiAccessDeniedHandler extends DefaultHandler implements AccessDeni
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
-        //TODO добавить лог
         super.handle(request, response);
     }
 
