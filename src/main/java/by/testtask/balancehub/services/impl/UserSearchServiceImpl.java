@@ -12,7 +12,6 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_USER')")
 public class UserSearchServiceImpl implements UserSearchService {
     private final ElasticsearchClient elasticsearchClient;
     private final UserMapper userMapper;

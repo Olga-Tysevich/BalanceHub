@@ -19,7 +19,6 @@ import by.testtask.balancehub.utils.PrincipalExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,6 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_USER')")
 public class AccountServiceImpl implements AccountService {
     private final AccountRepo accountRepo;
     private final AccountMapper accountMapper;
@@ -126,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
         Optional<Long> accountOwnerId = accountRepo.findUserIdByAccountId(fromAccountId);
 
         if (accountOwnerId.isEmpty() || !accountOwnerId.get().equals(currentUserId)) {
-            Long ownerId = accountOwnerId.orElseGet(() -> null);
+            Long ownerId = moneyTransferReq.getFromAccountId();
 
             throw new ProhibitedException("The account owner is different from the current user. " +
                     "Owner id: " + ownerId + ", current user id: " + currentUserId);

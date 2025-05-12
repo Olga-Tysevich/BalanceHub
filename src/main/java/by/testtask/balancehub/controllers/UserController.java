@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import static by.testtask.balancehub.dto.req.UserModificationRequests.*;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RequestMapping("v1/api/users")
 @RequiredArgsConstructor
 @Validated
+@PreAuthorize("hasRole('ROLE_USER')")
 public class UserController {
 
     private final UserService userService;

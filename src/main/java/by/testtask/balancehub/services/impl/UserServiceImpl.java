@@ -25,7 +25,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +33,6 @@ import java.util.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_USER')")
 public class UserServiceImpl implements UserService {
     private final EmailDataRepo emailDataRepo;
     private final PhoneDataRepo phoneDataRepo;

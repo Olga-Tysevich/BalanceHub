@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ import static by.testtask.balancehub.utils.Constants.TOKEN_TYPE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("v1/api/auth")
+@Validated
 public class AuthController {
     private final AuthService authService;
 

@@ -1,6 +1,8 @@
 package by.testtask.balancehub.exceptions;
 
-public class ProhibitedException extends RuntimeException {
+import org.springframework.security.access.AccessDeniedException;
+
+public class ProhibitedException extends AccessDeniedException {
     public ProhibitedException(String message) {
         super(message);
     }
