@@ -75,7 +75,6 @@ public class JwtProvider {
                     .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
-            //TODO переделать
             log.warn("JWT validation failed: {}", e.getMessage());
         }
 

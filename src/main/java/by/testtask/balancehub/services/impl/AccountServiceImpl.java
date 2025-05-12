@@ -17,6 +17,7 @@ import by.testtask.balancehub.repos.TransferRepo;
 import by.testtask.balancehub.services.AccountService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -63,6 +65,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void makeTransfer(TransferDTO transferDTO) {
+        log.info("Attempting to make a transfer from account id {} to account id {}", transferDTO.getFromAccountId(), transferDTO.getToAccountId());
         Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
 
         BigDecimal transferAmount = transferDTO.getAmount();
@@ -93,7 +96,11 @@ public class AccountServiceImpl implements AccountService {
             transferDTO.setConfirmedAt(transfer.getConfirmedAt());
             eventPublisher.publishEvent(transferConfirmed);
 
+            log.info("Transfer successfully confirmed for transfer id: {}", transferDTO.getId());
+
+
         } catch (Exception e) {
+            log.error("Transfer failed for transfer id: {}. Reversing operations.", transferDTO.getId(), e);
 
             Transfer transfer = transferMapper.toEntity(transferDTO);
             transfer.setStatus(TransferStatus.FAILED);
@@ -117,14 +124,21 @@ public class AccountServiceImpl implements AccountService {
 
         User currentUser = PrincipalExtractor.getCurrentUser();
 
-        if (Objects.isNull(currentUser)) throw new UnauthorizedException();
-        Long fromAccountId = moneyTransferReq.getFromAccountId();
+        if (Objects.isNull(currentUser)) {
+            log.error("Unauthorized access attempt. No current user found.");
+            throw new UnauthorizedException();
+        }
 
+        Long fromAccountId = moneyTransferReq.getFromAccountId();
         Long currentUserId = currentUser.getId();
+
+        log.info("Creating transfer request from account id: {} by user id: {}", fromAccountId, currentUserId);
+
         Optional<Long> accountOwnerId = accountRepo.findUserIdByAccountId(fromAccountId);
 
         if (accountOwnerId.isEmpty() || !accountOwnerId.get().equals(currentUserId)) {
             Long ownerId = moneyTransferReq.getFromAccountId();
+            log.error("Prohibited action: Account owner id: {} does not match current user id: {}", accountOwnerId.orElse(null), currentUserId);
 
             throw new ProhibitedException("The account owner is different from the current user. " +
                     "Owner id: " + ownerId + ", current user id: " + currentUserId);
@@ -136,6 +150,7 @@ public class AccountServiceImpl implements AccountService {
 
 
         if (fromAccountOpt.isEmpty()) {
+            log.error("Insufficient balance for account id: {}. Transfer amount: {}", fromAccountId, amount);
             throw new ProhibitedException("Insufficient balance: the balance is too low for this operation. Account id: " + fromAccountId);
         }
 
@@ -143,6 +158,7 @@ public class AccountServiceImpl implements AccountService {
         Optional<Account> toAccountOpt = accountRepo.findById(toAccountId);
 
         if (toAccountOpt.isEmpty()) {
+            log.error("Recipient account does not exist. Account id: {}", toAccountId);
             throw new ProhibitedException("The specified recipient account does not exist!. Account id: " + toAccountOpt);
         }
 
@@ -169,6 +185,8 @@ public class AccountServiceImpl implements AccountService {
         Events.TransferEvent transferEvent = new Events.TransferEvent(transferDTO);
 
         eventPublisher.publishEvent(transferEvent);
+
+        log.info("Transfer request created successfully for transfer id: {}", transfer.getId());
 
         return transfer.getId();
     }
