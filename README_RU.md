@@ -40,4 +40,4 @@ docker-compose up --build redis
 
 docker-compose up --build app
 
-3. Служба доступна по URL-адресу: http://localhost:8080/api/tracker
+3. Служба доступна по URL-адресу: http://localhost:8080
