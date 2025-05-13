@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,12 +39,17 @@ public class AuthController {
             description = "Authenticates the user with the provided credentials " +
                     "(email or phone and password) and returns the logged-in user data along with a refresh token in a cookie."
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "User logged in successfully",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = LoggedUserDTO.class))
-    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tokens refreshed successfully",
+                    content = @Content(schema = @Schema(implementation = LoggedUserDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - no refresh token provided or token is invalid"
+            )
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO req) {
         LoggedUserDTO respBody = authService.loginUser(req);
@@ -75,6 +81,23 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(
+            summary = "Refresh authentication tokens",
+            description = "Refreshes the access token using a valid refresh token. "
+                    + "Returns new access and refresh tokens. "
+                    + "The new refresh token is set as an HTTP-only cookie."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tokens refreshed successfully",
+                    content = @Content(schema = @Schema(implementation = LoggedUserDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - no refresh token provided or token is invalid"
+            )
+    })
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         String refreshToken = extractRefreshToken(request);
