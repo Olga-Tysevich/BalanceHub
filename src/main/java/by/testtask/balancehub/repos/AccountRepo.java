@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public interface AccountRepo extends JpaRepository<Account, Long> {
     List<Long> findAccountIdsWithBalanceUpToPercent(BigDecimal maxAllowedInterestRate);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Account> findByIdWithLock(Long id);
+    @Query("SELECT a FROM Account a WHERE a.id = :id")
+    Optional<Account> findByIdForUpdate(@Param("id") Long id);
 
 }
