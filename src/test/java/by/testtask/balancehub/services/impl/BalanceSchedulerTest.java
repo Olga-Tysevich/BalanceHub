@@ -56,15 +56,15 @@ class BalanceSchedulerTest extends BaseTest {
         assertEquals(0, expectedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale. "+
                 "Expected: " + expectedBalance + ". Actual: " + account.getBalance());
 
-        BigDecimal almostMaxAllowedInterestRate = maxAllowedInterestRate.subtract(new BigDecimal("0.10"));
-        BigDecimal balanceNearLimit = initialBalance.multiply(BigDecimal.ONE.add(almostMaxAllowedInterestRate));
+        BigDecimal almostMaxAllowedInterestRate = maxAllowedInterestRate.subtract(new BigDecimal("0.01"));
+        BigDecimal balanceNearLimit = initialBalance.multiply(almostMaxAllowedInterestRate);
         account.setBalance(balanceNearLimit);
         accountRepo.save(account);
 
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
 
-        BigDecimal maxAllowedBalance = initialBalance.multiply(BigDecimal.ONE.add(maxAllowedInterestRate));
+        BigDecimal maxAllowedBalance = initialBalance.multiply(maxAllowedInterestRate);
         assertEquals(0, maxAllowedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale. " +
                 "Expected: " + maxAllowedBalance + ". Actual: " + account.getBalance());
 
