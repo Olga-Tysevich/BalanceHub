@@ -21,6 +21,9 @@ public class AccountDTO {
     @NotNull(message = USER_ID_CANNOT_BE_NULL)
     private Long userId;
 
+    @NotNull(message = BONUS_BALANCE_MUST_BE_POSITIVE)
+    private BigDecimal bonusBalance;
+
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
     private BigDecimal balance;
 

@@ -33,7 +33,7 @@ public interface Constants {
     String UNKNOWN_USER = "Unknown index";
     String TOKEN_CANNOT_BE_NULL_OR_EMPTY = "Token cannot be null or empty!";
     String INVALID_REFRESH_TOKEN = "Invalid refresh token!";
-    String BALANCE_MUST_BE_POSITIVE = "Balance must be positive!";
+    String BALANCE_MUST_BE_POSITIVE = "Balance must be positive or zero!";
     String HOLD_MUST_BE_POSITIVE = "Hold balance must be positive!";
     String HOLD_MUST_BE_NULL = "Hold balance cannot be null";
     String TRANSFER_DATE_MUST_BE_IN_PAST = "Transfer date must be in the past";
@@ -42,5 +42,6 @@ public interface Constants {
     String ACCOUNT_CANNOT_BE_NULL = "Account must be specified";
     String VERSION_CANNOT_BE_NULL = "Version must be specified";
     String INITIAL_BALANCE_MUST_BE_POSITIVE = "Initial balance must be positive or zero!";
+    String BONUS_BALANCE_MUST_BE_POSITIVE = "Balance must be positive or zero!";
 
 }
