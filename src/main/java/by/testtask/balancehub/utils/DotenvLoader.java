@@ -11,6 +11,8 @@ public class DotenvLoader {
         Dotenv dotenv = Dotenv.load();
 
         System.setProperty("BALANCE_HUB_APPLICATION_HOST", Objects.requireNonNull(dotenv.get("BALANCE_HUB_APPLICATION_HOST")));
+        System.setProperty("BALANCE_HUB_INTEREST_RATE", Objects.requireNonNull(dotenv.get("BALANCE_HUB_INTEREST_RATE")));
+        System.setProperty("BALANCE_HUB_MAX_ALLOWED_INTEREST_RATE", Objects.requireNonNull(dotenv.get("BALANCE_HUB_MAX_ALLOWED_INTEREST_RATE")));
 
         System.setProperty("JWT_ACCESS_KEY_SECRET", Objects.requireNonNull(dotenv.get("JWT_ACCESS_KEY_SECRET")));
         System.setProperty("JWT_ACCESS_KEY_EXPIRATION_TIME", Objects.requireNonNull(dotenv.get("JWT_ACCESS_KEY_EXPIRATION_TIME")));
