@@ -11,7 +11,7 @@ import by.testtask.balancehub.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Map;
 import java.util.Set;
@@ -124,7 +124,7 @@ class UserServiceImplTest extends BaseTest {
 
         clearAuthentication();
 
-        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> userService.deleteEmail(emailId));
+        assertThrows(AccessDeniedException.class, () -> userService.deleteEmail(emailId));
     }
 
     @Test
@@ -145,7 +145,7 @@ class UserServiceImplTest extends BaseTest {
 
         clearAuthentication();
 
-        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> userService.deletePhone(phoneId));
+        assertThrows(AccessDeniedException.class, () -> userService.deletePhone(phoneId));
     }
 
     @Test
