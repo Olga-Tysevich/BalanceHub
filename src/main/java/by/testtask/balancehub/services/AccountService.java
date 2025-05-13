@@ -13,4 +13,6 @@ public interface AccountService {
 
     void makeTransfer(@NotNull TransferDTO transferDTO);
 
+    void safelyIncreaseBalance();
+
 }

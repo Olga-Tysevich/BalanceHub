@@ -12,13 +12,22 @@ import by.testtask.balancehub.exceptions.ProhibitedException;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.mappers.AccountMapper;
 import by.testtask.balancehub.mappers.TransferMapper;
+import by.testtask.balancehub.mappers.UserMapper;
 import by.testtask.balancehub.repos.AccountRepo;
 import by.testtask.balancehub.repos.TransferRepo;
 import by.testtask.balancehub.services.AccountService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,11 +43,17 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
-    private final AccountRepo accountRepo;
-    private final AccountMapper accountMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserMapper userMapper;
+    private final AccountRepo accountRepo;
+    private final CacheManager cacheManager;
+    private final AccountMapper accountMapper;
     private final TransferRepo transferRepo;
     private final TransferMapper transferMapper;
+    @Value("${spring.application.interestRate}")
+    private BigDecimal interestRate;
+    @Value("${spring.application.maxAllowedInterestRate}")
+    private BigDecimal maxAllowedInterestRate;
 
     @Override
     public Long createAccount(AccountDTO accountDTO) {
@@ -60,6 +75,59 @@ public class AccountServiceImpl implements AccountService {
         accountRepo.save(account);
 
         return account.getId();
+    }
+
+    @Override
+    public void safelyIncreaseBalance() {
+        int page = 0;
+        int size = 500;
+        Page<Long> accountIds;
+
+        do {
+            accountIds = accountRepo.findAccountIdsWithBalanceUpToPercent(maxAllowedInterestRate, PageRequest.of(page, size));
+            accountIds.forEach(this::processSingleAccount);
+            page++;
+        } while (accountIds.hasNext());
+    }
+
+    @Timed(value = "account.balance.increase", description = "Time taken to increase balance")
+    @Retryable(
+            retryFor = {ObjectOptimisticLockingFailureException.class},
+            backoff = @Backoff(delay = 100)
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processSingleAccount(Long accountId) {
+        try {
+            accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
+                BigDecimal currentBalance = account.getBalance();
+                BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
+                        .orElse(currentBalance);
+
+                if (initialBalance.compareTo(BigDecimal.ZERO) == 0 && currentBalance.compareTo(BigDecimal.ZERO) > 0) {
+                    account.setInitialBalance(currentBalance);
+                    accountRepo.save(account);
+                    return;
+                }
+
+                BigDecimal maxAllowed = initialBalance.multiply(maxAllowedInterestRate);
+                if (currentBalance.compareTo(maxAllowed) >= 0) return;
+
+                BigDecimal newBalance = currentBalance.multiply(BigDecimal.ONE.add(interestRate));
+                account.setBalance(newBalance.min(maxAllowed));
+                accountRepo.saveAndFlush(account);
+
+                evictCacheAndPublishEvent(account);
+            });
+        } catch (Exception e) {
+            log.error("Error processing account {}: {}", accountId, e.getMessage());
+        }
+    }
+
+    private void evictCacheAndPublishEvent(Account account) {
+        User user = account.getUser();
+        Optional.ofNullable(cacheManager.getCache("users"))
+                .ifPresent(cache -> cache.evict(user.getId()));
+        eventPublisher.publishEvent(new Events.UserChangedEvent(userMapper.toUserIndex(user)));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

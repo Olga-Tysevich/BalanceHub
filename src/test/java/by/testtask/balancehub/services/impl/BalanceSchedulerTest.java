@@ -2,6 +2,7 @@ package by.testtask.balancehub.services.impl;
 
 import by.testtask.balancehub.BaseTest;
 import by.testtask.balancehub.domain.Account;
+import by.testtask.balancehub.events.BalanceScheduler;
 import by.testtask.balancehub.repos.AccountRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
