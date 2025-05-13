@@ -163,7 +163,6 @@ public class AccountServiceImpl implements AccountService {
 
             log.info("Transfer successfully confirmed for transfer id: {}", transferDTO.getId());
 
-
         } catch (Exception e) {
             log.error("Transfer failed for transfer id: {}. Reversing operations.", transferDTO.getId(), e);
 
@@ -189,7 +188,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Long createTransfer(MoneyTransferReq moneyTransferReq) {
-
         User currentUser = PrincipalExtractor.getCurrentUser();
 
         if (Objects.isNull(currentUser)) {
@@ -216,7 +214,6 @@ public class AccountServiceImpl implements AccountService {
 
         Optional<Account> fromAccountOpt = accountRepo.findByIdAndSufficientBalance(fromAccountId, amount);
 
-
         if (fromAccountOpt.isEmpty()) {
             log.error("Insufficient balance for account id: {}. Transfer amount: {}", fromAccountId, amount);
             throw new ProhibitedException("Insufficient balance: the balance is too low for this operation. Account id: " + fromAccountId);
@@ -238,35 +235,26 @@ public class AccountServiceImpl implements AccountService {
         BigDecimal bonusBalance = fromAccount.getBonusBalance();
         BigDecimal commonBalance = currentBalance.add(bonusBalance);
 
-
-        BigDecimal writtenOffAmount = new BigDecimal(0);
-        BigDecimal writtenOffBonusAmount = new BigDecimal(0);
+        BigDecimal writtenOffAmount = BigDecimal.ZERO;
+        BigDecimal writtenOffBonusAmount = BigDecimal.ZERO;
 
         if (currentBalance.compareTo(transferAmount) >= 0) {
 
-            BigDecimal accountFromNewAmount = fromAccount.getBalance().subtract(transferAmount);
-            fromAccount.setBalance(accountFromNewAmount);
             fromAccount.setHold(fromAccount.getHold().add(transferAmount));
             writtenOffAmount = transferAmount;
 
         } else if (bonusBalance.compareTo(transferAmount) >= 0) {
 
-            BigDecimal accountFromNewAmount = fromAccount.getBonusBalance().subtract(transferAmount);
-            fromAccount.setBonusBalance(accountFromNewAmount);
             fromAccount.setBonusHold(fromAccount.getBonusHold().add(transferAmount));
             writtenOffBonusAmount = transferAmount;
 
         } else if (commonBalance.compareTo(transferAmount) >= 0) {
 
-            BigDecimal remainingAmountForSubtract = transferAmount.subtract(currentBalance);
-            BigDecimal transferFromBalance = transferAmount.subtract(remainingAmountForSubtract);
-
-            fromAccount.setBonusBalance(bonusBalance.subtract(remainingAmountForSubtract));
-            fromAccount.setBalance(BigDecimal.ZERO);
-            fromAccount.setHold(fromAccount.getHold().add(transferFromBalance));
-            fromAccount.setBonusHold(fromAccount.getBonusHold().add(remainingAmountForSubtract));
-            writtenOffAmount = transferFromBalance;
-            writtenOffBonusAmount = remainingAmountForSubtract;
+            BigDecimal remainingFromBonus = transferAmount.subtract(currentBalance);
+            fromAccount.setHold(fromAccount.getHold().add(currentBalance));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().add(remainingFromBonus));
+            writtenOffAmount = currentBalance;
+            writtenOffBonusAmount = remainingFromBonus;
 
         }
 
@@ -292,6 +280,4 @@ public class AccountServiceImpl implements AccountService {
 
         return transfer.getId();
     }
-
-
 }
