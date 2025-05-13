@@ -37,6 +37,6 @@ Simple banking system with user accounts, balance updates and secure money trans
 
    Run the following command to start the app:
 
-   docker-compose up --build app
+   docker-compose up --build balancehub
 
 4. The service is accessible at the URL: http://localhost:8080
