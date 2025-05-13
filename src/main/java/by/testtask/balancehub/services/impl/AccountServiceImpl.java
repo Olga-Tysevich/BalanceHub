@@ -17,6 +17,7 @@ import by.testtask.balancehub.repos.AccountRepo;
 import by.testtask.balancehub.repos.TransferRepo;
 import by.testtask.balancehub.services.AccountService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,9 +79,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void safelyIncreaseBalance() {
         List<Long> accountIds = accountRepo.findAccountIdsWithBalanceUpToPercent(maxAllowedInterestRate);
-        accountIds.forEach(this::processSingleAccount);
+        accountIds.parallelStream().forEach(this::processSingleAccount);
     }
 
+    @Timed(value = "account.balance.increase", description = "Time taken to increase balance")
     @Retryable(
             retryFor = {ObjectOptimisticLockingFailureException.class},
             backoff = @Backoff(delay = 100)
@@ -104,13 +106,10 @@ public class AccountServiceImpl implements AccountService {
 
                 BigDecimal newBalance = currentBalance.multiply(BigDecimal.ONE.add(interestRate));
                 account.setBalance(newBalance.min(maxAllowed));
-                accountRepo.save(account);
+                accountRepo.saveAndFlush(account);
 
                 evictCacheAndPublishEvent(account);
             });
-        } catch (ObjectOptimisticLockingFailureException e) {
-            log.warn("Retrying account {}", accountId);
-            processSingleAccount(accountId);
         } catch (Exception e) {
             log.error("Error processing account {}: {}", accountId, e.getMessage());
         }
