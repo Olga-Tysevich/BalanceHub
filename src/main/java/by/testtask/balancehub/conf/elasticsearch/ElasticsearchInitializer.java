@@ -62,8 +62,6 @@ public class ElasticsearchInitializer {
         }
     }
 
-
-    //TODO логи
     private void syncAllUsersToElasticsearch() {
         Set<UserIndexDTO> users = transactionTemplate.execute(status -> getAllUsers());
 
