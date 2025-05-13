@@ -51,4 +51,14 @@ public class Account {
     @Version
     private Long version;
 
+    public void setBalance(@NotNull
+                           @DecimalMin(value = "0.00", message = INITIAL_BALANCE_MUST_BE_POSITIVE)
+                           BigDecimal balance) {
+
+        if (this.initialBalance.compareTo(BigDecimal.ZERO) == 0) {
+            this.initialBalance = balance;
+        }
+        this.balance = balance;
+    }
+
 }

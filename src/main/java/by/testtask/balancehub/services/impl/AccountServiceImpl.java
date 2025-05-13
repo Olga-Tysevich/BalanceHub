@@ -103,12 +103,6 @@ public class AccountServiceImpl implements AccountService {
                 BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
                         .orElse(currentBalance);
 
-                if (initialBalance.compareTo(BigDecimal.ZERO) == 0 && currentBalance.compareTo(BigDecimal.ZERO) > 0) {
-                    account.setInitialBalance(currentBalance);
-                    accountRepo.save(account);
-                    return;
-                }
-
                 BigDecimal maxAllowed = initialBalance.multiply(maxAllowedInterestRate);
                 if (currentBalance.compareTo(maxAllowed) >= 0) return;
 
@@ -147,13 +141,13 @@ public class AccountServiceImpl implements AccountService {
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
             accountRepo.save(fromAccount);
 
-            transferDTO.setStatus(TransferStatus.CONFIRMED);
+            transferDTO.setStatus(TransferStatus.COMPLETED);
             transferDTO.setConfirmedAt(LocalDateTime.now());
 
             Transfer transfer = transferRepo.findById(transferDTO.getId()).orElseThrow();
             transfer.setFromAccount(fromAccount);
             transfer.setToAccount(toAccount);
-            transfer.setStatus(TransferStatus.CONFIRMED);
+            transfer.setStatus(TransferStatus.COMPLETED);
             transfer.setConfirmedAt(transferDTO.getConfirmedAt());
 
             transferRepo.save(transfer);
