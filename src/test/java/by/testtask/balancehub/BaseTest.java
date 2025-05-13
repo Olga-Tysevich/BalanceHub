@@ -46,7 +46,6 @@ public class BaseTest {
 
     @BeforeEach
     public void testSomethingUsingLettuce() {
-        // Retrieve the Redis URI from the container
         String redisURI = redisContainer.getRedisURI();
         RedisClient client = RedisClient.create(redisURI);
         try (StatefulRedisConnection<String, String> connection = client.connect()) {
