@@ -65,7 +65,8 @@ public class BalanceScheduler {
 
         }
     }
-
+    
+    //TODO сделать логику обновления через очередь и доставать не все, а только нужные аккаунты
     private void saveAccount(Account account) {
         try {
             accountRepo.save(account);
