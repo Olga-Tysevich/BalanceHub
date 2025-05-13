@@ -90,7 +90,7 @@ class AccountServiceImplTest extends BaseTest {
     }
 
     @Test
-    void testCreateTransfer_UnauthorizedUser_ThrowsAuthenticationCredentialsNotFoundException() {
+    void testCreateTransfer_UnauthorizedUser_ThrowsUnauthorizedException() {
         MoneyTransferReq req = new MoneyTransferReq();
         req.setFromAccountId(1L);
         req.setToAccountId(2L);

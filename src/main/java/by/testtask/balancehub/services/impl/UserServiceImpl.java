@@ -21,7 +21,6 @@ import by.testtask.balancehub.services.UserService;
 import by.testtask.balancehub.utils.PrincipalExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
@@ -54,7 +53,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CachePut(value = "users", key = "#id")
     public Long addPhone(String phone) {
         PhoneData phoneData = createPhone(phone);
 
