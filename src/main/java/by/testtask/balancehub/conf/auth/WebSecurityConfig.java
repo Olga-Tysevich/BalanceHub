@@ -98,4 +98,5 @@ public class WebSecurityConfig {
     public ForbiddenEntryPoint entryPoint() {
         return new ForbiddenEntryPoint();
     }
+
 }
