@@ -6,16 +6,18 @@ import by.testtask.balancehub.domain.User;
 import by.testtask.balancehub.events.BalanceScheduler;
 import by.testtask.balancehub.repos.AccountRepo;
 import by.testtask.balancehub.repos.UserRepo;
+import by.testtask.balancehub.utils.Elasticsearch;
 import by.testtask.balancehub.utils.ObjectBuilder;
+import by.testtask.balancehub.utils.PostgresSQL;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest(properties = "spring.task.scheduling.enabled=false")
 class BalanceSchedulerTest extends BaseTest {
 
     @Value("${spring.application.interestRate}")
@@ -32,6 +34,11 @@ class BalanceSchedulerTest extends BaseTest {
 
     @Autowired
     private BalanceScheduler balanceScheduler;
+
+    @DynamicPropertySource
+    static void registerDynamicProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.schedule.timing.increaseBalance.initialDelay", () -> 1_000_000);
+    }
 
     @Test
     void testBalanceIncreaseWithLimit() {
