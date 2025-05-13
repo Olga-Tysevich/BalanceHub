@@ -38,6 +38,6 @@
 
    Выполните следующую команду для запуска приложения:
 
-   docker-compose up --build app
+   docker-compose up --build balancehub
 
-4. Служба доступна по URL-адресу: http://localhost:8080
+5. Служба доступна по URL-адресу: http://localhost:8080
