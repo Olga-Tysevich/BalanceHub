@@ -131,6 +131,7 @@ public class AccountServiceImpl implements AccountService {
         Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
 
         BigDecimal transferAmount = transferDTO.getAmount();
+        BigDecimal transferBonusAmount = transferDTO.getBonusAmount();
         BigDecimal newBalance = toAccount.getBalance().add(transferAmount);
 
         try {
@@ -138,7 +139,9 @@ public class AccountServiceImpl implements AccountService {
             accountRepo.save(toAccount);
 
             Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
+
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().subtract(transferBonusAmount));
             accountRepo.save(fromAccount);
 
             transferDTO.setStatus(TransferStatus.COMPLETED);
@@ -160,7 +163,6 @@ public class AccountServiceImpl implements AccountService {
 
             log.info("Transfer successfully confirmed for transfer id: {}", transferDTO.getId());
 
-
         } catch (Exception e) {
             log.error("Transfer failed for transfer id: {}. Reversing operations.", transferDTO.getId(), e);
 
@@ -173,7 +175,10 @@ public class AccountServiceImpl implements AccountService {
 
             Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
             fromAccount.setBalance(fromAccount.getBalance().add(transferAmount));
+            fromAccount.setBonusBalance(fromAccount.getBonusBalance().add(transferBonusAmount));
+
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().subtract(transferBonusAmount));
 
             accountRepo.save(fromAccount);
 
@@ -183,7 +188,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Long createTransfer(MoneyTransferReq moneyTransferReq) {
-
         User currentUser = PrincipalExtractor.getCurrentUser();
 
         if (Objects.isNull(currentUser)) {
@@ -210,7 +214,6 @@ public class AccountServiceImpl implements AccountService {
 
         Optional<Account> fromAccountOpt = accountRepo.findByIdAndSufficientBalance(fromAccountId, amount);
 
-
         if (fromAccountOpt.isEmpty()) {
             log.error("Insufficient balance for account id: {}. Transfer amount: {}", fromAccountId, amount);
             throw new ProhibitedException("Insufficient balance: the balance is too low for this operation. Account id: " + fromAccountId);
@@ -228,15 +231,40 @@ public class AccountServiceImpl implements AccountService {
         Account toAccount = toAccountOpt.get();
 
         BigDecimal transferAmount = moneyTransferReq.getAmount();
-        BigDecimal newAccountFromAmount = fromAccount.getBalance().subtract(transferAmount);
-        fromAccount.setHold(transferAmount);
-        fromAccount.setBalance(newAccountFromAmount);
+        BigDecimal currentBalance = fromAccount.getBalance();
+        BigDecimal bonusBalance = fromAccount.getBonusBalance();
+        BigDecimal commonBalance = currentBalance.add(bonusBalance);
+
+        BigDecimal writtenOffAmount = BigDecimal.ZERO;
+        BigDecimal writtenOffBonusAmount = BigDecimal.ZERO;
+
+        if (currentBalance.compareTo(transferAmount) >= 0) {
+
+            fromAccount.setHold(fromAccount.getHold().add(transferAmount));
+            writtenOffAmount = transferAmount;
+
+        } else if (bonusBalance.compareTo(transferAmount) >= 0) {
+
+            fromAccount.setBonusHold(fromAccount.getBonusHold().add(transferAmount));
+            writtenOffBonusAmount = transferAmount;
+
+        } else if (commonBalance.compareTo(transferAmount) >= 0) {
+
+            BigDecimal remainingFromBonus = transferAmount.subtract(currentBalance);
+            fromAccount.setHold(fromAccount.getHold().add(currentBalance));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().add(remainingFromBonus));
+            writtenOffAmount = currentBalance;
+            writtenOffBonusAmount = remainingFromBonus;
+
+        }
+
         accountRepo.save(fromAccount);
 
         Transfer transfer = Transfer.builder()
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
-                .amount(amount)
+                .amount(writtenOffAmount)
+                .bonusAmount(writtenOffBonusAmount)
                 .status(TransferStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -252,6 +280,4 @@ public class AccountServiceImpl implements AccountService {
 
         return transfer.getId();
     }
-
-
 }

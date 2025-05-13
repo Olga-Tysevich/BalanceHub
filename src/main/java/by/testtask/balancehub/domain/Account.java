@@ -43,8 +43,14 @@ public class Account {
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @Column(name = "bonus_hold", nullable = false, precision = 19, scale = 2)
+    @NotNull(message = HOLD_CANNOT_BE_NULL)
+    @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
+    @Builder.Default
+    private BigDecimal bonusHold = BigDecimal.ZERO;
+
     @Column(nullable = false, precision = 19, scale = 2)
-    @NotNull(message = HOLD_MUST_BE_NULL)
+    @NotNull(message = HOLD_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
     @Builder.Default
     private BigDecimal hold = BigDecimal.ZERO;
@@ -65,6 +71,14 @@ public class Account {
             this.initialBalance = balance;
         }
         this.balance = balance;
+    }
+
+    public BigDecimal getBonusBalance() {
+        return bonusBalance.subtract(bonusHold);
+    }
+
+    public BigDecimal getBalance() {
+        return balance.subtract(hold);
     }
 
 }

@@ -35,6 +35,10 @@ public class Transfer {
     @DecimalMin(value = "0.00", message = TRANSFER_AMOUNT_BE_POSITIVE)
     private BigDecimal amount;
 
+    @Column(name = "bonus_amount", nullable = false, precision = 19, scale = 2)
+    @DecimalMin(value = "0.00", message = TRANSFER_AMOUNT_BE_POSITIVE)
+    private BigDecimal bonusAmount;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

@@ -23,6 +23,8 @@ public class TransferDTO {
     private Long id;
     @DecimalMin(value = "0.00", message = TRANSFER_AMOUNT_BE_POSITIVE)
     private BigDecimal amount;
+    @DecimalMin(value = "0.00", message = TRANSFER_AMOUNT_BE_POSITIVE)
+    private BigDecimal bonusAmount;
     @NotNull(message = USER_CANNOT_BE_NULL)
     private Long fromUserId;
     @NotNull(message = USER_CANNOT_BE_NULL)

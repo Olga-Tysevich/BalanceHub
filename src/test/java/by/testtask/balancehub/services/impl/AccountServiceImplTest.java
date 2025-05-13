@@ -6,6 +6,7 @@ import by.testtask.balancehub.domain.Transfer;
 import by.testtask.balancehub.domain.TransferStatus;
 import by.testtask.balancehub.dto.common.AccountDTO;
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
+import by.testtask.balancehub.events.TransferQueueProcessor;
 import by.testtask.balancehub.exceptions.ProhibitedException;
 import by.testtask.balancehub.exceptions.UnauthorizedException;
 import by.testtask.balancehub.repos.AccountRepo;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
@@ -39,6 +42,11 @@ class AccountServiceImplTest extends BaseTest {
 
     @Autowired
     private TransferRepo transferRepo;
+
+    @DynamicPropertySource
+    static void registerDynamicProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.schedule.timing.increaseBalance.initialDelay", () -> 1_000_000);
+    }
 
     @Test
     void testTransfer_successfully() {

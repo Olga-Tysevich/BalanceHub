@@ -1,4 +1,4 @@
-package by.testtask.balancehub.services.impl;
+package by.testtask.balancehub.events;
 import by.testtask.balancehub.dto.redis.TransferDTO;
 import by.testtask.balancehub.services.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class TransferQueueProcessor {
     private final AccountService accountService;
     private final RedisTemplate<String, TransferDTO> redisTemplate;
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRateString = "${spring.schedule.queueProcessor.fixedRate}")
     public void processQueue() {
         TransferDTO transferDTO = redisTemplate.opsForList().rightPop(TRANSFER_QUEUE_NAME);
         if (Objects.nonNull(transferDTO)) {
