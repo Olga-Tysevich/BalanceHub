@@ -1,7 +1,6 @@
 package by.testtask.balancehub.repos;
 
 import by.testtask.balancehub.domain.Account;
-import by.testtask.balancehub.domain.User;
 import jakarta.persistence.LockModeType;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
