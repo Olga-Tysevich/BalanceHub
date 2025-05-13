@@ -44,6 +44,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String path = request.getRequestURI();
+        log.debug("path: {}", path);
+        log.debug("ignoredUrls: {}", ignoredUrls);
+        log.debug("shouldNotFilter: {}", ignoredUrls.stream().anyMatch(pattern -> pathMatcher.match(pattern, path)));
         return ignoredUrls.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
