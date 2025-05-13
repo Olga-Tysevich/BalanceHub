@@ -88,7 +88,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processSingleAccount(Long accountId) {
         try {
-            accountRepo.findByIdWithLock(accountId).ifPresent(account -> {
+            accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
                 BigDecimal currentBalance = account.getBalance();
                 BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
                         .orElse(currentBalance);
