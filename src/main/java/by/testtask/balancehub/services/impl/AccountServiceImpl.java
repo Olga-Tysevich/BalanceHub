@@ -241,31 +241,33 @@ public class AccountServiceImpl implements AccountService {
 
         BigDecimal writtenOffAmount = new BigDecimal(0);
         BigDecimal writtenOffBonusAmount = new BigDecimal(0);
+
         if (currentBalance.compareTo(transferAmount) >= 0) {
 
             BigDecimal accountFromNewAmount = fromAccount.getBalance().subtract(transferAmount);
             fromAccount.setBalance(accountFromNewAmount);
-            fromAccount.setHold(transferAmount);
+            fromAccount.setHold(fromAccount.getHold().add(transferAmount));
             writtenOffAmount = transferAmount;
-            
+
         } else if (bonusBalance.compareTo(transferAmount) >= 0) {
 
             BigDecimal accountFromNewAmount = fromAccount.getBonusBalance().subtract(transferAmount);
             fromAccount.setBonusBalance(accountFromNewAmount);
+            fromAccount.setBonusHold(fromAccount.getBonusHold().add(transferAmount));
             writtenOffBonusAmount = transferAmount;
-            
-        } else if (currentBalance.compareTo(transferAmount) <= 0
-                && commonBalance.compareTo(transferAmount) >= 0) {
 
-            BigDecimal remainingAmountForSubtract = transferAmount.subtract(bonusBalance);
+        } else if (commonBalance.compareTo(transferAmount) >= 0) {
+
+            BigDecimal remainingAmountForSubtract = transferAmount.subtract(currentBalance);
             BigDecimal transferFromBalance = transferAmount.subtract(remainingAmountForSubtract);
 
-            BigDecimal accountFromNewBonusAmount = currentBalance.subtract(remainingAmountForSubtract);
-
-            fromAccount.setBonusBalance(BigDecimal.ZERO);
-            fromAccount.setBalance(accountFromNewBonusAmount);
+            fromAccount.setBonusBalance(bonusBalance.subtract(remainingAmountForSubtract));
+            fromAccount.setBalance(BigDecimal.ZERO);
+            fromAccount.setHold(fromAccount.getHold().add(transferFromBalance));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().add(remainingAmountForSubtract));
             writtenOffAmount = transferFromBalance;
             writtenOffBonusAmount = remainingAmountForSubtract;
+
         }
 
         accountRepo.save(fromAccount);
