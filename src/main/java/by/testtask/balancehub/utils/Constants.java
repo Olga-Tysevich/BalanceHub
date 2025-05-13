@@ -35,7 +35,7 @@ public interface Constants {
     String INVALID_REFRESH_TOKEN = "Invalid refresh token!";
     String BALANCE_MUST_BE_POSITIVE = "Balance must be positive or zero!";
     String HOLD_MUST_BE_POSITIVE = "Hold balance must be positive!";
-    String HOLD_MUST_BE_NULL = "Hold balance cannot be null";
+    String HOLD_CANNOT_BE_NULL = "Hold balance cannot be null";
     String TRANSFER_DATE_MUST_BE_IN_PAST = "Transfer date must be in the past";
     String TRANSFER_STATUS_CANNOT_BE_NUL = "Transfer cannot be null";
     String TRANSFER_AMOUNT_BE_POSITIVE = "Hold balance must be positive!";

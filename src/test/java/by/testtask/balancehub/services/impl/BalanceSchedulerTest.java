@@ -93,7 +93,6 @@ class BalanceSchedulerTest extends BaseTest {
                 "Expected: " + BigDecimal.ZERO.setScale(2) + ". Actual: " + zeroAccount.getBalance());
     }
 
-    @Transactional
     @Test
     void testNewAccountBalanceIncrease() {
 

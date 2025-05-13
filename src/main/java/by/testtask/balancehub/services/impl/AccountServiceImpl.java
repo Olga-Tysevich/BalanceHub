@@ -131,6 +131,7 @@ public class AccountServiceImpl implements AccountService {
         Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
 
         BigDecimal transferAmount = transferDTO.getAmount();
+        BigDecimal transferBonusAmount = transferDTO.getBonusAmount();
         BigDecimal newBalance = toAccount.getBalance().add(transferAmount);
 
         try {
@@ -138,7 +139,9 @@ public class AccountServiceImpl implements AccountService {
             accountRepo.save(toAccount);
 
             Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
+
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().subtract(transferBonusAmount));
             accountRepo.save(fromAccount);
 
             transferDTO.setStatus(TransferStatus.COMPLETED);
@@ -173,7 +176,10 @@ public class AccountServiceImpl implements AccountService {
 
             Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
             fromAccount.setBalance(fromAccount.getBalance().add(transferAmount));
+            fromAccount.setBonusBalance(fromAccount.getBonusBalance().add(transferBonusAmount));
+
             fromAccount.setHold(fromAccount.getHold().subtract(transferAmount));
+            fromAccount.setBonusHold(fromAccount.getBonusHold().subtract(transferBonusAmount));
 
             accountRepo.save(fromAccount);
 
@@ -228,15 +234,47 @@ public class AccountServiceImpl implements AccountService {
         Account toAccount = toAccountOpt.get();
 
         BigDecimal transferAmount = moneyTransferReq.getAmount();
-        BigDecimal newAccountFromAmount = fromAccount.getBalance().subtract(transferAmount);
-        fromAccount.setHold(transferAmount);
-        fromAccount.setBalance(newAccountFromAmount);
+        BigDecimal currentBalance = fromAccount.getBalance();
+        BigDecimal bonusBalance = fromAccount.getBonusBalance();
+        BigDecimal commonBalance = currentBalance.add(bonusBalance);
+
+
+        BigDecimal writtenOffAmount = new BigDecimal(0);
+        BigDecimal writtenOffBonusAmount = new BigDecimal(0);
+        if (currentBalance.compareTo(transferAmount) >= 0) {
+
+            BigDecimal accountFromNewAmount = fromAccount.getBalance().subtract(transferAmount);
+            fromAccount.setBalance(accountFromNewAmount);
+            fromAccount.setHold(transferAmount);
+            writtenOffAmount = transferAmount;
+            
+        } else if (bonusBalance.compareTo(transferAmount) >= 0) {
+
+            BigDecimal accountFromNewAmount = fromAccount.getBonusBalance().subtract(transferAmount);
+            fromAccount.setBonusBalance(accountFromNewAmount);
+            writtenOffBonusAmount = transferAmount;
+            
+        } else if (currentBalance.compareTo(transferAmount) <= 0
+                && commonBalance.compareTo(transferAmount) >= 0) {
+
+            BigDecimal remainingAmountForSubtract = transferAmount.subtract(bonusBalance);
+            BigDecimal transferFromBalance = transferAmount.subtract(remainingAmountForSubtract);
+
+            BigDecimal accountFromNewBonusAmount = currentBalance.subtract(remainingAmountForSubtract);
+
+            fromAccount.setBonusBalance(BigDecimal.ZERO);
+            fromAccount.setBalance(accountFromNewBonusAmount);
+            writtenOffAmount = transferFromBalance;
+            writtenOffBonusAmount = remainingAmountForSubtract;
+        }
+
         accountRepo.save(fromAccount);
 
         Transfer transfer = Transfer.builder()
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
-                .amount(amount)
+                .amount(writtenOffAmount)
+                .bonusAmount(writtenOffBonusAmount)
                 .status(TransferStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
