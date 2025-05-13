@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -33,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -78,8 +79,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void safelyIncreaseBalance() {
-        List<Long> accountIds = accountRepo.findAccountIdsWithBalanceUpToPercent(maxAllowedInterestRate);
-        accountIds.parallelStream().forEach(this::processSingleAccount);
+        int page = 0;
+        int size = 500;
+        Page<Long> accountIds;
+
+        do {
+            accountIds = accountRepo.findAccountIdsWithBalanceUpToPercent(maxAllowedInterestRate, PageRequest.of(page, size));
+            accountIds.forEach(this::processSingleAccount);
+            page++;
+        } while (accountIds.hasNext());
     }
 
     @Timed(value = "account.balance.increase", description = "Time taken to increase balance")
