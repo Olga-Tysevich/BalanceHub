@@ -42,7 +42,7 @@ public class LoggerAspect {
 
     @AfterThrowing(pointcut = "springBeanPointcut()", throwing = "e")
     public void logException(JoinPoint jp, Exception e) {
-        log.error("✗ Exception in {}.{}() with cause = {} and message = {}",
+        log.error("Exception in {}.{}() with cause = {} and message = {}",
                 jp.getSignature().getDeclaringTypeName(),
                 jp.getSignature().getName(),
                 e.getCause() != null ? e.getCause() : "NULL",
