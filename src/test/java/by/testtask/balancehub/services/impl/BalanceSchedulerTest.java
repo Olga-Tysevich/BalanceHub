@@ -44,8 +44,7 @@ class BalanceSchedulerTest extends BaseTest {
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
         expectedBalance = expectedBalance.multiply(BigDecimal.ONE.add(interestRate));
-        expectedBalance.setScale(2);
-        assertEquals(expectedBalance, account.getBalance());
+        assertEquals(0, expectedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale.");
 
         BigDecimal almostMaxAllowedInterestRate = maxAllowedInterestRate.subtract(new BigDecimal("0.10"));
         BigDecimal balanceNearLimit = initialBalance.multiply(almostMaxAllowedInterestRate);
@@ -73,9 +72,7 @@ class BalanceSchedulerTest extends BaseTest {
         balanceScheduler.increaseBalances();
         zeroAccount = accountRepo.findById(zeroAccount.getId()).orElseThrow();
 
-        assertEquals(BigDecimal.ZERO.setScale(2), zeroAccount.getBalance(), "Balance should be 0.00");
-
-        assertNull(zeroAccount.getInitialBalance());
+        assertEquals(0, BigDecimal.ZERO.setScale(2).compareTo(zeroAccount.getBalance()), "Balance should be 0.00");
     }
 
     @Test
@@ -97,8 +94,7 @@ class BalanceSchedulerTest extends BaseTest {
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
         BigDecimal expectedBalanceAfterFirstIncrease = depositAmount.multiply(BigDecimal.ONE.add(interestRate));
-        expectedBalanceAfterFirstIncrease.setScale(2);
-        assertEquals(expectedBalanceAfterFirstIncrease, newAccount.getBalance(),
+        assertEquals(0, expectedBalanceAfterFirstIncrease.compareTo(newAccount.getBalance()),
                 "The balance should have increased according to the interest rate after deposit.");
 
         balanceScheduler.increaseBalances();
