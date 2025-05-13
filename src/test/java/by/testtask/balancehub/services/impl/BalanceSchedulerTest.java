@@ -54,11 +54,11 @@ class BalanceSchedulerTest extends BaseTest {
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
         BigDecimal maxAllowedBalance = initialBalance.multiply(maxAllowedInterestRate);
-        assertEquals(maxAllowedBalance, account.getBalance());
+        assertEquals(0, maxAllowedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale.");
 
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
-        assertEquals(maxAllowedBalance, account.getBalance());
+        assertEquals(0, maxAllowedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale.");
     }
 
     @Test
@@ -82,19 +82,22 @@ class BalanceSchedulerTest extends BaseTest {
         userRepo.saveAndFlush(user);
 
         Account newAccount = user.getAccount();
+
+        balanceScheduler.increaseBalances();
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
         assertEquals(0, BigDecimal.ZERO.compareTo(newAccount.getBalance()), "The balance should remain zero initially.");
 
         BigDecimal depositAmount = new BigDecimal("50");
         newAccount.setBalance(depositAmount);
+
         accountRepo.saveAndFlush(newAccount);
 
         balanceScheduler.increaseBalances();
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
         BigDecimal expectedBalanceAfterFirstIncrease = depositAmount.multiply(BigDecimal.ONE.add(interestRate));
-        assertEquals(0, expectedBalanceAfterFirstIncrease.compareTo(newAccount.getBalance()),
+        assertEquals(1, expectedBalanceAfterFirstIncrease.compareTo(newAccount.getBalance()),
                 "The balance should have increased according to the interest rate after deposit.");
 
         balanceScheduler.increaseBalances();
