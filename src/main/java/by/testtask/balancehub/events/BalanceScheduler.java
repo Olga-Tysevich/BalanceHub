@@ -13,7 +13,8 @@ public class BalanceScheduler {
     private final AccountService accountService;
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRateString = "${spring.schedule.timing.increaseBalance}",
+            initialDelayString = "${spring.schedule.timing.increaseBalance.initialDelay}")
     public void increaseBalances() {
         accountService.safelyIncreaseBalance();
     }
