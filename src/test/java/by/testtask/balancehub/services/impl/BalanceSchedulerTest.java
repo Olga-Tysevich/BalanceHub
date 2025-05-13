@@ -41,6 +41,10 @@ class BalanceSchedulerTest extends BaseTest {
     @Test
     void testBalanceIncreaseWithLimit() {
         Account account = accountRepo.findById(1L).get();
+        BigDecimal depositAmount = new BigDecimal("1000");
+        account.setBalance(depositAmount);
+        accountRepo.saveAndFlush(account);
+
         BigDecimal initialBalance = account.getBalance();
 
         balanceScheduler.increaseBalances();
