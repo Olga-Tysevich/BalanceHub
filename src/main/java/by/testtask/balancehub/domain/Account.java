@@ -31,9 +31,15 @@ public class Account {
     @NotNull(message = USER_CANNOT_BE_NULL)
     private User user;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(name = "bonus_balance",nullable = false, precision = 19, scale = 2)
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = BALANCE_MUST_BE_POSITIVE)
+    @Builder.Default
+    private BigDecimal bonusBalance = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 19, scale = 2)
+    @NotNull(message = BONUS_BALANCE_MUST_BE_POSITIVE)
+    @DecimalMin(value = "0.00", message = BONUS_BALANCE_MUST_BE_POSITIVE)
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 

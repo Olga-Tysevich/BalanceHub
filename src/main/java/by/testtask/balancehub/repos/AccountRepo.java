@@ -23,7 +23,7 @@ public interface AccountRepo extends JpaRepository<Account, Long> {
     @Query("SELECT a.user.id FROM Account a WHERE a.id = :accountId")
     Optional<Long> findUserIdByAccountId(@NotNull Long accountId);
 
-    @Query("SELECT a.id FROM Account a WHERE a.balance <= a.initialBalance * :maxAllowedInterestRate")
+    @Query("SELECT a.id FROM Account a WHERE a.bonusBalance <= a.initialBalance * :maxAllowedInterestRate")
     Page<Long> findAccountIdsWithBalanceUpToPercent(@Param("maxAllowedInterestRate") BigDecimal maxAllowedInterestRate, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
