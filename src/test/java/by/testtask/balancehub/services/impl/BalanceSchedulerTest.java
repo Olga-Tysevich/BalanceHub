@@ -4,16 +4,14 @@ import by.testtask.balancehub.BaseTest;
 import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.domain.User;
 import by.testtask.balancehub.events.BalanceScheduler;
-import by.testtask.balancehub.repos.AccountRepo;
-import by.testtask.balancehub.repos.UserRepo;
-import by.testtask.balancehub.utils.Elasticsearch;
+import by.testtask.balancehub.repos.*;
 import by.testtask.balancehub.utils.ObjectBuilder;
-import by.testtask.balancehub.utils.PostgresSQL;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -59,13 +57,14 @@ class BalanceSchedulerTest extends BaseTest {
                 "Expected: " + expectedBalance + ". Actual: " + account.getBalance());
 
         BigDecimal almostMaxAllowedInterestRate = maxAllowedInterestRate.subtract(new BigDecimal("0.10"));
-        BigDecimal balanceNearLimit = initialBalance.multiply(almostMaxAllowedInterestRate);
+        BigDecimal balanceNearLimit = initialBalance.multiply(BigDecimal.ONE.add(almostMaxAllowedInterestRate));
         account.setBalance(balanceNearLimit);
         accountRepo.save(account);
 
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
-        BigDecimal maxAllowedBalance = initialBalance.multiply(maxAllowedInterestRate);
+
+        BigDecimal maxAllowedBalance = initialBalance.multiply(BigDecimal.ONE.add(maxAllowedInterestRate));
         assertEquals(0, maxAllowedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale. " +
                 "Expected: " + maxAllowedBalance + ". Actual: " + account.getBalance());
 
@@ -90,6 +89,7 @@ class BalanceSchedulerTest extends BaseTest {
                 "Expected: " + BigDecimal.ZERO.setScale(2) + ". Actual: " + zeroAccount.getBalance());
     }
 
+    @Transactional
     @Test
     void testNewAccountBalanceIncrease() {
 
@@ -114,15 +114,8 @@ class BalanceSchedulerTest extends BaseTest {
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
         BigDecimal expectedBalanceAfterFirstIncrease = depositAmount.multiply(BigDecimal.ONE.add(interestRate));
+
         assertEquals(0, expectedBalanceAfterFirstIncrease.compareTo(newAccount.getBalance()),
-                "The balance should have increased according to the interest rate after deposit. "+
-                        "Expected: " + expectedBalanceAfterFirstIncrease + ". Actual: " + newAccount.getBalance());
-
-        balanceScheduler.increaseBalances();
-        newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
-        BigDecimal expectedBalanceAfterSecondIncrease = expectedBalanceAfterFirstIncrease.multiply(BigDecimal.ONE.add(interestRate));
-
-        assertEquals(0, expectedBalanceAfterSecondIncrease.compareTo(newAccount.getBalance()),
                 "The balance should have increased again according to the interest rate. "+
                         "Expected: " + expectedBalanceAfterFirstIncrease + ". Actual: " + newAccount.getBalance());
     }

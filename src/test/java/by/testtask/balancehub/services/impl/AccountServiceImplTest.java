@@ -82,7 +82,7 @@ class AccountServiceImplTest extends BaseTest {
         assertEquals(fromAccount.getId(), transferResult.getFromAccount().getId(), "Unexpected transfer fromAccount");
         assertEquals(toAccount.getId(), transferResult.getToAccount().getId(), "Unexpected transfer toAccount");
         assertEquals(0, transfer.getAmount().compareTo(transferResult.getAmount()), "Unexpected transfer amount");
-        assertEquals(TransferStatus.CONFIRMED, transferResult.getStatus(), "Unexpected transfer status");
+        assertEquals(TransferStatus.COMPLETED, transferResult.getStatus(), "Unexpected transfer status");
         assertNotNull(transferResult.getCreatedAt(), "Unexpected transfer createdAt");
         assertNotNull(transferResult.getConfirmedAt(), "Unexpected transfer confirmedAt");
         assertEquals(1L, transferResult.getVersion(), "Unexpected transfer version");
