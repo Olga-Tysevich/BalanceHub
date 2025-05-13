@@ -39,6 +39,7 @@ class BalanceSchedulerTest extends BaseTest {
         BigDecimal initialBalance = account.getBalance();
 
         balanceScheduler.increaseBalances();
+        account = accountRepo.findById(account.getId()).orElseThrow();
 
         BigDecimal expectedBalance = initialBalance.multiply(BigDecimal.ONE.add(interestRate));
         assertEquals(0, expectedBalance.compareTo(account.getBalance()), "Balances should match ignoring scale. "+
