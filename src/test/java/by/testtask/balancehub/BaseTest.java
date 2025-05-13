@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.utility.DockerImageName;
 
+import java.math.BigDecimal;
 
 
 @RunWith(SpringRunner.class)
@@ -57,6 +57,8 @@ public class BaseTest {
     @DynamicPropertySource
     static void registerDynamicProperties(DynamicPropertyRegistry registry) {
         redisContainer.start();
+        registry.add("spring.application.interestRate", () -> new BigDecimal("0.10"));
+        registry.add("spring.application.maxAllowedInterestRate", () -> new BigDecimal("2.07"));
         registry.add("spring.datasource.url", PostgresSQL.container::getJdbcUrl);
         registry.add("spring.datasource.username", PostgresSQL.container::getUsername);
         registry.add("spring.datasource.password", PostgresSQL.container::getPassword);

@@ -50,9 +50,9 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final TransferRepo transferRepo;
     private final TransferMapper transferMapper;
-    @Value("${spring.application.interestRate}")
+    @Value("${spring.application.interestRate:0.00}")
     private BigDecimal interestRate;
-    @Value("${spring.application.maxAllowedInterestRate}")
+    @Value("${spring.application.maxAllowedInterestRate:0.00}")
     private BigDecimal maxAllowedInterestRate;
 
     @Override
