@@ -63,7 +63,7 @@ public class Account {
     @Version
     private Long version;
 
-    public final void setBalance(@NotNull
+    public void setBalance(@NotNull
                            @DecimalMin(value = "0.00", message = INITIAL_BALANCE_MUST_BE_POSITIVE)
                            BigDecimal balance) {
 
@@ -73,11 +73,11 @@ public class Account {
         this.balance = balance;
     }
 
-    public final BigDecimal getBonusBalance() {
+    public BigDecimal getBonusBalance() {
         return bonusBalance.subtract(bonusHold);
     }
 
-    public final BigDecimal getBalance() {
+    public BigDecimal getBalance() {
         return balance.subtract(hold);
     }
 
