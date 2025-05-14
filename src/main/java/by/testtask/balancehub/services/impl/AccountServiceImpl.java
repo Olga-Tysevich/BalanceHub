@@ -108,7 +108,7 @@ public class AccountServiceImpl implements AccountService {
                 BigDecimal maxAllowed = initialBalance.multiply(maxAllowedInterestRate);
                 if (bonusBalance.compareTo(maxAllowed) >= 0) return;
 
-                BigDecimal newBalance = bonusBalance.add(bonusBalance.multiply(BigDecimal.ONE.add(interestRate)));
+                BigDecimal newBalance = account.getBonusBalance().add(bonusBalance.multiply(BigDecimal.ONE.add(interestRate)));
                 account.setBonusBalance(newBalance.min(maxAllowed));
                 accountRepo.saveAndFlush(account);
 
