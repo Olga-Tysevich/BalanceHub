@@ -1,5 +1,6 @@
 package by.testtask.balancehub.services.impl;
 
+import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.domain.EmailData;
 import by.testtask.balancehub.domain.PhoneData;
 import by.testtask.balancehub.domain.User;
@@ -148,6 +149,14 @@ public class UserServiceImpl implements UserService {
         }
 
         return users;
+    }
+
+
+    public void evictCacheAndPublishEvent(Account account) {
+        User user = account.getUser();
+        Optional.ofNullable(cacheManager.getCache("users"))
+                .ifPresent(cache -> cache.evict(user.getId()));
+        eventPublisher.publishEvent(new Events.UserChangedEvent(userMapper.toUserIndex(user)));
     }
 
     private EmailData createEmail(String email) {

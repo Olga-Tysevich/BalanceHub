@@ -3,7 +3,7 @@ package by.testtask.balancehub.services.impl;
 import by.testtask.balancehub.BaseTest;
 import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.domain.User;
-import by.testtask.balancehub.events.BalanceScheduler;
+import by.testtask.balancehub.events.BalancehubScheduler;
 import by.testtask.balancehub.repos.*;
 import by.testtask.balancehub.utils.ObjectBuilder;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
-class BalanceSchedulerTest extends BaseTest {
+class BalancehubSchedulerTest extends BaseTest {
 
     @Value("${spring.application.interestRate}")
     protected BigDecimal interestRate;
@@ -30,7 +30,7 @@ class BalanceSchedulerTest extends BaseTest {
     private UserRepo userRepo;
 
     @Autowired
-    private BalanceScheduler balanceScheduler;
+    private BalancehubScheduler balancehubScheduler;
 
     @DynamicPropertySource
     static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -49,14 +49,14 @@ class BalanceSchedulerTest extends BaseTest {
 
         BigDecimal initialBalance = account.getAvailableBalance();
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
 
         BigDecimal expectedBalance = initialBalance.multiply(BigDecimal.ONE.add(interestRate));
         assertEquals(0, expectedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. "+
                 "Expected: " + expectedBalance + ". Actual: " + account.getAvailableBonusBalance());
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
         expectedBalance = expectedBalance.multiply(BigDecimal.ONE.add(interestRate));
         assertEquals(0, expectedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. "+
@@ -67,14 +67,14 @@ class BalanceSchedulerTest extends BaseTest {
         account.setBonusBalance(balanceNearLimit);
         accountRepo.save(account);
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
 
         BigDecimal maxAllowedBalance = initialBalance.multiply(maxAllowedInterestRate);
         assertEquals(0, maxAllowedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. " +
                 "Expected: " + maxAllowedBalance + ". Actual: " + account.getAvailableBonusBalance());
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
         assertEquals(0, maxAllowedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. "+
                 "Expected: " + maxAllowedBalance + ". Actual: " + account.getAvailableBonusBalance());
@@ -88,7 +88,7 @@ class BalanceSchedulerTest extends BaseTest {
         Account zeroAccount = user.getAccount();
         zeroAccount = accountRepo.findById(zeroAccount.getId()).orElseThrow();
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         zeroAccount = accountRepo.findById(zeroAccount.getId()).orElseThrow();
 
         assertEquals(0, BigDecimal.ZERO.setScale(2).compareTo(zeroAccount.getAvailableBonusBalance()), "Balance should be 0.00. "+
@@ -103,7 +103,7 @@ class BalanceSchedulerTest extends BaseTest {
 
         Account newAccount = user.getAccount();
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
         assertEquals(0, BigDecimal.ZERO.compareTo(newAccount.getAvailableBonusBalance()), "The balance should remain zero initially. "+
@@ -115,7 +115,7 @@ class BalanceSchedulerTest extends BaseTest {
         accountRepo.saveAndFlush(newAccount);
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
-        balanceScheduler.increaseBalances();
+        balancehubScheduler.increaseBalances();
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
         BigDecimal expectedBalanceAfterFirstIncrease = depositAmount.multiply(BigDecimal.ONE.add(interestRate));

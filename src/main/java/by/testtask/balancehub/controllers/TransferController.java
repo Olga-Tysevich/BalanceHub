@@ -1,7 +1,7 @@
 package by.testtask.balancehub.controllers;
 
 import by.testtask.balancehub.dto.req.MoneyTransferReq;
-import by.testtask.balancehub.services.AccountService;
+import by.testtask.balancehub.services.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,7 +25,7 @@ import java.util.Map;
 @PreAuthorize("hasRole('ROLE_USER')")
 @Validated
 public class TransferController {
-    private final AccountService accountService;
+    private final TransferService transferService;
 
     @Operation(
             summary = "Initiate a money transfer",
@@ -39,7 +39,7 @@ public class TransferController {
     )
     @PostMapping("/add")
     public ResponseEntity<?> addTransfer(@RequestBody @Valid MoneyTransferReq req) {
-        Long transferId = accountService.createTransfer(req);
+        Long transferId = transferService.createTransfer(req);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("transferId", transferId));
     }
 

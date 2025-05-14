@@ -30,7 +30,7 @@ public class JwtProvider {
     @Value("${spring.application.security.jwt.access-key.expiration-time}")
     private Integer jwtAccessExpirationTime;
 
-    @Value(("${spring.application.security.jwt.refresh-key.expiration-time}"))
+    @Value("${spring.application.security.jwt.refresh-key.expiration-time}")
     private Integer jwtRefreshExpirationTime;
 
     public String generateAccessToken(@NotNull User user, String currentLogin) {
