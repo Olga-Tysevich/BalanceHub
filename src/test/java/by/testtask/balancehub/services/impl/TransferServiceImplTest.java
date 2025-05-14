@@ -17,6 +17,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static by.testtask.balancehub.utils.TestConstants.USERNAME_1_EMAIL_LIST;
 import static by.testtask.balancehub.utils.TestConstants.USERNAME_1_PASSWORD;
@@ -46,55 +47,59 @@ public class TransferServiceImplTest extends BaseTest {
 
     @Test
     public void testTransfer_successfully() {
-        Account fromAccount = accountRepo.findById(1L).get();
-
-        super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
+        Account fromAccount = accountRepo.findById(1L).orElseThrow();
+        Account toAccount = accountRepo.findById(2L).orElseThrow();
 
         fromAccount.releaseFromHold(fromAccount.getHold());
         fromAccount.releaseFromBonusHold(fromAccount.getBonusHold());
-
-        fromAccount.setInitialBalance(new BigDecimal("200.00"));
         fromAccount.setBalance(new BigDecimal("200.00"));
         fromAccount.setBonusBalance(BigDecimal.ZERO);
-
-        Account toAccount = accountRepo.findById(2L).get();
         toAccount.setBalance(BigDecimal.ZERO);
 
-        accountRepo.saveAndFlush(fromAccount);
-        accountRepo.saveAndFlush(toAccount);
+        accountRepo.saveAllAndFlush(List.of(fromAccount, toAccount));
 
-        MoneyTransferReq transfer = new MoneyTransferReq();
-        transfer.setFromAccountId(fromAccount.getId());
-        transfer.setToAccountId(toAccount.getId());
-        transfer.setAmount(new BigDecimal("50.00"));
+        BigDecimal initialTotal = fromAccount.getRawBalance()
+                .add(toAccount.getRawBalance())
+                .add(fromAccount.getRawBonusBalance())
+                .add(toAccount.getRawBonusBalance());
+
+        MoneyTransferReq transferRequest = new MoneyTransferReq();
+        transferRequest.setFromAccountId(fromAccount.getId());
+        transferRequest.setToAccountId(toAccount.getId());
+        transferRequest.setAmount(new BigDecimal("50.00"));
 
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
-        Long transferId = transferService.createTransfer(transfer);
+        Long transferId = transferService.createTransfer(transferRequest);
 
-        fromAccount = accountRepo.findById(1L).get();
-
+        fromAccount = accountRepo.findById(1L).orElseThrow();
         assertThat(fromAccount.getHold()).isEqualTo(new BigDecimal("50.00"));
         assertThat(fromAccount.getAvailableBalance()).isEqualTo(new BigDecimal("150.00"));
 
         transferQueueProcessor.processQueue();
 
-        toAccount = accountRepo.findById(2L).get();
+        fromAccount = accountRepo.findById(1L).orElseThrow();
+        toAccount = accountRepo.findById(2L).orElseThrow();
+        Transfer transferResult = transferRepo.findById(transferId).orElseThrow();
 
-        assertThat(toAccount.getAvailableBalance()).isEqualTo(new BigDecimal("50.00"));
-        assertThat(fromAccount.getHold()).isEqualTo(new BigDecimal("50.00"));
-        assertThat(fromAccount.getAvailableBalance()).isEqualTo(new BigDecimal("150.00"));
+        assertThat(fromAccount.getRawBalance())
+                .isEqualTo(new BigDecimal("150.00"));
+        assertThat(fromAccount.getHold())
+                .isEqualTo(BigDecimal.ZERO);
+        assertThat(toAccount.getRawBalance())
+                .isEqualTo(new BigDecimal("50.00"));
 
-        Transfer transferResult = transferRepo.findById(transferId).get();
-
-        assertNotNull(transferResult.getId(), "Unexpected transfer id");
-        assertEquals(fromAccount.getId(), transferResult.getFromAccount().getId(), "Unexpected transfer fromAccount");
-        assertEquals(toAccount.getId(), transferResult.getToAccount().getId(), "Unexpected transfer toAccount");
-        assertEquals(0, transfer.getAmount().compareTo(transferResult.getAmount()), "Unexpected transfer amount");
-        assertEquals(TransferStatus.COMPLETED, transferResult.getStatus(), "Unexpected transfer status");
-        assertNotNull(transferResult.getCreatedAt(), "Unexpected transfer createdAt");
-        assertNotNull(transferResult.getConfirmedAt(), "Unexpected transfer confirmedAt");
-        assertEquals(1L, transferResult.getVersion(), "Unexpected transfer version");
-
+        BigDecimal finalTotal = fromAccount.getRawBalance()
+                .add(toAccount.getRawBalance())
+                .add(fromAccount.getRawBonusBalance())
+                .add(toAccount.getRawBonusBalance());
+        assertThat(finalTotal)
+                .isEqualByComparingTo(initialTotal);
+        assertThat(transferResult.getStatus())
+                .isEqualTo(TransferStatus.COMPLETED);
+        assertThat(transferResult.getAmount())
+                .isEqualByComparingTo(new BigDecimal("50.00"));
+        assertThat(transferResult.getConfirmedAt())
+                .isNotNull();
     }
 
     @Test

@@ -72,7 +72,7 @@ public class TransferServiceImpl implements TransferService {
         Optional<Account> fromAccountOpt = accountRepo.findByIdAndSufficientBalance(fromAccountId, amount);
 
         if (fromAccountOpt.isEmpty()) {
-            log.error("Insufficient balance for account id: {}. Transfer amount: {}", fromAccountId, amount);
+            log.error("Insufficient balance for account id: {}. ", fromAccountId);
             throw new ProhibitedException("Insufficient balance: the balance is too low for this operation. Account id: " + fromAccountId);
         }
 
@@ -155,8 +155,6 @@ public class TransferServiceImpl implements TransferService {
             log.info("Transfer successfully confirmed for transfer id: {}", transferDTO.getId());
             eventPublisher.publishEvent(transferConfirmed);
 
-            log.info("carryOutTransfer toAccount: {}", accountRepo.findById(transferDTO.getToAccountId()).orElseThrow());
-            log.info("carryOutTransfer from account: {}", accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow());
         } catch (Exception e) {
             cancelTransfer(transferDTO);
             log.error("Transfer failed for transfer id: {}. Reversing operations.", transferDTO.getId(), e);
@@ -176,6 +174,11 @@ public class TransferServiceImpl implements TransferService {
 
         Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
 
+        BigDecimal fromAccountNewAmount = fromAccount.getRawBalance().subtract(transferAmount);
+        BigDecimal fromAccountNewBonusAmount = fromAccount.getRawBonusBalance().subtract(transferBonusAmount);
+
+        fromAccount.setBalance(fromAccountNewAmount);
+        fromAccount.setBonusBalance(fromAccountNewBonusAmount);
         fromAccount.releaseFromHold(transferAmount);
         accountRepo.save(fromAccount);
 

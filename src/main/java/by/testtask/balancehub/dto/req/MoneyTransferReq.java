@@ -1,5 +1,6 @@
 package by.testtask.balancehub.dto.req;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class MoneyTransferReq {
     private Long toAccountId;
 
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
+    @DecimalMin(value = "0.00", message = TRANSFER_AMOUNT_BE_POSITIVE)
     private BigDecimal amount;
 
 }
