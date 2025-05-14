@@ -3,10 +3,7 @@ package by.testtask.balancehub.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -47,12 +44,14 @@ public class Account {
     @NotNull(message = HOLD_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
     @Builder.Default
+    @Setter(AccessLevel.PROTECTED)
     private BigDecimal bonusHold = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 19, scale = 2)
     @NotNull(message = HOLD_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
     @Builder.Default
+    @Setter(AccessLevel.PROTECTED)
     private BigDecimal hold = BigDecimal.ZERO;
 
     @Column(name = "initial_balance", nullable = false, precision = 19, scale = 2)
@@ -79,6 +78,42 @@ public class Account {
 
     public BigDecimal getBalance() {
         return balance.subtract(hold);
+    }
+
+    public void addToHold(BigDecimal amount) {
+        if (this.hold.add(amount).compareTo(this.balance) > 0) {
+            throw new IllegalArgumentException("Insufficient available balance to hold funds.");
+        }
+        this.hold = this.hold.add(amount);
+    }
+
+    public void addToBonusHold(BigDecimal amount) {
+        if (this.bonusHold.add(amount).compareTo(this.bonusBalance) > 0) {
+            throw new IllegalArgumentException("Insufficient available bonus balance to bonus hold funds.");
+        }
+        this.bonusHold = this.bonusBalance.add(amount);
+    }
+
+    public void releaseFromHold(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Amount to release must be positive.");
+        }
+        if (this.hold.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Cannot release more than is held.");
+        }
+        this.hold = this.hold.subtract(amount);
+        this.balance = this.balance.subtract(amount);
+    }
+
+    public void releaseFromBonusHold(BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Amount to release must be positive.");
+        }
+        if (this.bonusHold.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Cannot release more than is held in bonus.");
+        }
+        this.bonusHold = this.bonusHold.subtract(amount);
+        this.bonusBalance = this.bonusBalance.subtract(amount);
     }
 
 }
