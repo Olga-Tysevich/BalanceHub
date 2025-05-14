@@ -18,9 +18,9 @@ import java.util.Optional;
 public interface AccountRepo extends JpaRepository<Account, Long> {
 
     @Query("SELECT a FROM Account a WHERE a.id = :accountId " +
-            "AND (((a.balance - a.hold)" +
+            "AND ((a.balance - a.hold)" +
             " + (a.bonusBalance - a.bonusHold))" +
-            " - :amount) >= 0")
+            " >= :amount")
     Optional<Account> findByIdAndSufficientBalance(@NotNull Long accountId, @NotNull BigDecimal amount);
 
     @Query("SELECT a.user.id FROM Account a WHERE a.id = :accountId")
