@@ -67,7 +67,7 @@ public interface UserMapper {
         if (Objects.isNull(account)) return null;
         return UserIndexDTO.AccountIndex.builder()
                 .id(account.getId())
-                .balance(account.getBalance())
+                .balance(account.getAvailableBalance())
                 .build();
     }
 
@@ -134,7 +134,7 @@ public interface UserMapper {
     @Named("mapAccountFromEntity")
     default UserDTO.InnerAccountData mapAccountFromEntity(Account account) {
         if (Objects.isNull(account)) return null;
-        return new UserDTO.InnerAccountData(account.getId(), account.getBalance());
+        return new UserDTO.InnerAccountData(account.getId(), account.getAvailableBalance());
     }
 
 }

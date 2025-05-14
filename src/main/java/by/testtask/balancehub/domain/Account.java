@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.Optional;
 
 import static by.testtask.balancehub.utils.Constants.*;
 
@@ -16,8 +18,8 @@ import static by.testtask.balancehub.utils.Constants.*;
 @Entity
 @Table(name = "accounts")
 public class Account {
+
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "accountIdSeq")
     @SequenceGenerator(name = "accountIdSeq", sequenceName = "account_id_seq", allocationSize = 1)
     @NotNull(message = ID_CANNOT_BE_NULL)
@@ -28,30 +30,30 @@ public class Account {
     @NotNull(message = USER_CANNOT_BE_NULL)
     private User user;
 
-    @Column(name = "bonus_balance",nullable = false, precision = 19, scale = 2)
+    @Column(name = "bonus_balance", nullable = false, precision = 19, scale = 2)
     @NotNull(message = BALANCE_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = BALANCE_MUST_BE_POSITIVE)
     @Builder.Default
+    @Getter(AccessLevel.NONE)
     private BigDecimal bonusBalance = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 19, scale = 2)
     @NotNull(message = BONUS_BALANCE_MUST_BE_POSITIVE)
     @DecimalMin(value = "0.00", message = BONUS_BALANCE_MUST_BE_POSITIVE)
     @Builder.Default
+    @Getter(AccessLevel.NONE)
     private BigDecimal balance = BigDecimal.ZERO;
 
     @Column(name = "bonus_hold", nullable = false, precision = 19, scale = 2)
     @NotNull(message = HOLD_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
     @Builder.Default
-    @Setter(AccessLevel.PROTECTED)
     private BigDecimal bonusHold = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 19, scale = 2)
     @NotNull(message = HOLD_CANNOT_BE_NULL)
     @DecimalMin(value = "0.00", message = HOLD_MUST_BE_POSITIVE)
     @Builder.Default
-    @Setter(AccessLevel.PROTECTED)
     private BigDecimal hold = BigDecimal.ZERO;
 
     @Column(name = "initial_balance", nullable = false, precision = 19, scale = 2)
@@ -65,63 +67,71 @@ public class Account {
     public void setBalance(@NotNull
                            @DecimalMin(value = "0.00", message = INITIAL_BALANCE_MUST_BE_POSITIVE)
                            BigDecimal balance) {
-
-        if (this.initialBalance.compareTo(BigDecimal.ZERO) == 0) {
+        if (this.initialBalance == null || this.initialBalance.compareTo(BigDecimal.ZERO) == 0) {
             this.initialBalance = balance;
         }
         this.balance = balance;
     }
 
-    public BigDecimal getBonusBalance() {
-        return bonusBalance.subtract(bonusHold);
+    public BigDecimal getRawBalance() {
+        return Optional.ofNullable(balance).orElse(BigDecimal.ZERO);
     }
 
-    public BigDecimal getBalance() {
-        return balance.subtract(hold);
+    public BigDecimal getRawBonusBalance() {
+        return Optional.ofNullable(bonusBalance).orElse(BigDecimal.ZERO);
+    }
+
+    public BigDecimal getAvailableBalance() {
+        return getRawBalance().subtract(getHold());
+    }
+
+    public BigDecimal getAvailableBonusBalance() {
+        return getRawBonusBalance().subtract(getBonusHold());
     }
 
     public void addToHold(BigDecimal amount) {
-        if (this.hold.add(amount).compareTo(this.balance) > 0) {
+        if (getHold().add(amount).compareTo(getRawBalance()) > 0) {
             throw new IllegalArgumentException("Insufficient available balance to hold funds.");
         }
         this.hold = this.hold.add(amount);
     }
 
     public void addToBonusHold(BigDecimal amount) {
-        if (this.bonusHold.add(amount).compareTo(this.bonusBalance) > 0) {
+        if (getBonusHold().add(amount).compareTo(getRawBonusBalance()) > 0) {
             throw new IllegalArgumentException("Insufficient available bonus balance to bonus hold funds.");
         }
-        this.bonusHold = this.bonusBalance.add(amount);
+        this.bonusHold = this.bonusHold.add(amount);
     }
 
     public void releaseFromHold(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount to release must be positive.");
-        }
-        if (this.hold.compareTo(amount) < 0) {
+        validatePositive(amount, "Amount to release must be positive.");
+        if (getHold().compareTo(amount) < 0) {
             throw new IllegalArgumentException("Cannot release more than is held.");
         }
         this.hold = this.hold.subtract(amount);
-        this.balance = this.balance.subtract(amount);
+        this.balance = getRawBalance().subtract(amount);
     }
 
     public void releaseFromBonusHold(BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount to release must be positive.");
-        }
-        if (this.bonusHold.compareTo(amount) < 0) {
+        validatePositive(amount, "Amount to release must be positive.");
+        if (getBonusHold().compareTo(amount) < 0) {
             throw new IllegalArgumentException("Cannot release more than is held in bonus.");
         }
         this.bonusHold = this.bonusHold.subtract(amount);
-        this.bonusBalance = this.bonusBalance.subtract(amount);
+        this.bonusBalance = getRawBonusBalance().subtract(amount);
     }
 
     public BigDecimal getHold() {
-        return new BigDecimal(hold.toPlainString());
+        return Optional.ofNullable(hold).orElse(BigDecimal.ZERO);
     }
 
     public BigDecimal getBonusHold() {
-        return new BigDecimal(bonusHold.toPlainString());
-    }
+        return Optional.ofNullable(bonusHold).orElse(BigDecimal.ZERO);    }
 
+
+    private void validatePositive(BigDecimal amount, String message) {
+        if (Objects.isNull(amount) || amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }

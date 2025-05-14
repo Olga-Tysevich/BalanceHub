@@ -85,7 +85,13 @@ public class AccountServiceImpl implements AccountService {
 
         do {
             accountIds = accountRepo.findAccountIdsWithBalanceUpToPercent(maxAllowedInterestRate, PageRequest.of(page, size));
-            accountIds.forEach(this::processSingleAccount);
+            accountIds.forEach(accountId -> {
+                try {
+                    processSingleAccount(accountId);
+                } catch (Exception e) {
+                    log.error("Error processing account {}: {}", accountId, e.getMessage());
+                }
+            });
             page++;
         } while (accountIds.hasNext());
     }
@@ -97,27 +103,23 @@ public class AccountServiceImpl implements AccountService {
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processSingleAccount(Long accountId) {
-        try {
-            accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
-                BigDecimal accountBonusBalance = account.getBonusBalance().add(account.getBonusHold());
+        accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
+            BigDecimal accountBonusBalance = account.getAvailableBonusBalance().add(account.getBonusHold());
 
-                BigDecimal bonusBalance = accountBonusBalance.compareTo(BigDecimal.ZERO) == 0?
-                        account.getInitialBalance() : accountBonusBalance;
+            BigDecimal bonusBalance = accountBonusBalance.compareTo(BigDecimal.ZERO) == 0 ?
+                    account.getInitialBalance() : accountBonusBalance;
 
-                BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
-                        .orElseThrow();
-                BigDecimal maxAllowed = initialBalance.multiply(maxAllowedInterestRate);
-                if (bonusBalance.compareTo(maxAllowed) >= 0) return;
+            BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
+                    .orElseThrow();
+            BigDecimal maxAllowed = initialBalance.multiply(maxAllowedInterestRate);
+            if (bonusBalance.compareTo(maxAllowed) >= 0) return;
 
-                BigDecimal newBalance = bonusBalance.multiply(BigDecimal.ONE.add(interestRate));
-                account.setBonusBalance(newBalance.min(maxAllowed));
-                accountRepo.saveAndFlush(account);
+            BigDecimal newBalance = bonusBalance.multiply(BigDecimal.ONE.add(interestRate));
+            account.setBonusBalance(newBalance.min(maxAllowed));
+            accountRepo.saveAndFlush(account);
 
-                evictCacheAndPublishEvent(account);
-            });
-        } catch (Exception e) {
-            log.error("Error processing account {}: {}", accountId, e.getMessage());
-        }
+            evictCacheAndPublishEvent(account);
+        });
     }
 
     private void evictCacheAndPublishEvent(Account account) {
@@ -127,65 +129,77 @@ public class AccountServiceImpl implements AccountService {
         eventPublisher.publishEvent(new Events.UserChangedEvent(userMapper.toUserIndex(user)));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void makeTransfer(TransferDTO transferDTO) {
         log.info("Attempting to make a transfer from account id {} to account id {}", transferDTO.getFromAccountId(), transferDTO.getToAccountId());
-        Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
-
-        BigDecimal transferAmount = transferDTO.getAmount();
-        BigDecimal transferBonusAmount = transferDTO.getBonusAmount();
-        BigDecimal newBalance = toAccount.getBalance().add(transferAmount).add(transferBonusAmount);
-
         try {
-            toAccount.setBalance(newBalance);
-            accountRepo.save(toAccount);
-
-            Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
-
-            fromAccount.releaseFromHold(transferAmount);
-            accountRepo.save(fromAccount);
-
-            transferDTO.setStatus(TransferStatus.COMPLETED);
-            transferDTO.setConfirmedAt(LocalDateTime.now());
-
-            Transfer transfer = transferRepo.findById(transferDTO.getId()).orElseThrow();
-            transfer.setFromAccount(fromAccount);
-            transfer.setToAccount(toAccount);
-            transfer.setStatus(TransferStatus.COMPLETED);
-            transfer.setConfirmedAt(transferDTO.getConfirmedAt());
-
-            transferRepo.save(transfer);
+            Transfer transfer = carryOutTransfer(transferDTO);
 
             Events.TransferConfirmed transferConfirmed = new Events.TransferConfirmed(transferDTO);
 
             transferDTO.setStatus(transfer.getStatus());
             transferDTO.setConfirmedAt(transfer.getConfirmedAt());
-            eventPublisher.publishEvent(transferConfirmed);
 
             log.info("Transfer successfully confirmed for transfer id: {}", transferDTO.getId());
+            eventPublisher.publishEvent(transferConfirmed);
 
+            log.info("carryOutTransfer toAccount: {}", accountRepo.findById(transferDTO.getToAccountId()).orElseThrow());
+            log.info("carryOutTransfer from account: {}", accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow());
         } catch (Exception e) {
+            cancelTransfer(transferDTO);
             log.error("Transfer failed for transfer id: {}. Reversing operations.", transferDTO.getId(), e);
-
-            Transfer transfer = transferMapper.toEntity(transferDTO);
-            transfer.setStatus(TransferStatus.FAILED);
-
-            transferRepo.save(transfer);
-
-            transferDTO.setStatus(TransferStatus.FAILED);
-
-            Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
-            fromAccount.setBalance(fromAccount.getBalance().add(transferAmount));
-            fromAccount.setBonusBalance(fromAccount.getBonusBalance().add(transferBonusAmount));
-
-            fromAccount.releaseFromHold(transferAmount);
-            fromAccount.releaseFromBonusHold(transferBonusAmount);
-
-            accountRepo.save(fromAccount);
-
             eventPublisher.publishEvent(transferDTO);
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected Transfer carryOutTransfer(TransferDTO transferDTO) {
+        Account toAccount = accountRepo.findById(transferDTO.getToAccountId()).orElseThrow();
+
+        BigDecimal transferAmount = transferDTO.getAmount();
+        BigDecimal transferBonusAmount = transferDTO.getBonusAmount();
+        BigDecimal newBalance = toAccount.getAvailableBalance().add(transferAmount).add(transferBonusAmount);
+        toAccount.setBalance(newBalance);
+        accountRepo.save(toAccount);
+
+        Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
+
+        fromAccount.releaseFromHold(transferAmount);
+        accountRepo.save(fromAccount);
+
+        transferDTO.setStatus(TransferStatus.COMPLETED);
+        transferDTO.setConfirmedAt(LocalDateTime.now());
+
+        Transfer transfer = transferRepo.findById(transferDTO.getId()).orElseThrow();
+        transfer.setFromAccount(fromAccount);
+        transfer.setToAccount(toAccount);
+        transfer.setStatus(TransferStatus.COMPLETED);
+        transfer.setConfirmedAt(transferDTO.getConfirmedAt());
+
+        return transferRepo.save(transfer);
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected void cancelTransfer(TransferDTO transferDTO) {
+        BigDecimal transferAmount = transferDTO.getAmount();
+        BigDecimal transferBonusAmount = transferDTO.getBonusAmount();
+
+        Transfer transfer = transferMapper.toEntity(transferDTO);
+        transfer.setStatus(TransferStatus.FAILED);
+
+        transferRepo.save(transfer);
+
+        transferDTO.setStatus(TransferStatus.FAILED);
+
+        Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
+        fromAccount.setBalance(fromAccount.getAvailableBalance().add(transferAmount));
+        fromAccount.setBonusBalance(fromAccount.getAvailableBonusBalance().add(transferBonusAmount));
+
+        fromAccount.releaseFromHold(transferAmount);
+        fromAccount.releaseFromBonusHold(transferBonusAmount);
+
+        accountRepo.save(fromAccount);
     }
 
     @Override
@@ -237,8 +251,8 @@ public class AccountServiceImpl implements AccountService {
         Account toAccount = toAccountOpt.get();
 
         BigDecimal transferAmount = moneyTransferReq.getAmount();
-        BigDecimal currentBalance = fromAccount.getBalance();
-        BigDecimal bonusBalance = fromAccount.getBonusBalance();
+        BigDecimal currentBalance = fromAccount.getAvailableBalance();
+        BigDecimal bonusBalance = fromAccount.getAvailableBonusBalance();
         BigDecimal commonBalance = currentBalance.add(bonusBalance);
 
         BigDecimal writtenOffAmount = BigDecimal.ZERO;
@@ -259,6 +273,7 @@ public class AccountServiceImpl implements AccountService {
             BigDecimal remainingFromBonus = transferAmount.subtract(currentBalance);
             fromAccount.addToHold(currentBalance);
             fromAccount.addToBonusHold(remainingFromBonus);
+
             writtenOffAmount = currentBalance;
             writtenOffBonusAmount = remainingFromBonus;
 

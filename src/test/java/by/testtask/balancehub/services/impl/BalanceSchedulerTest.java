@@ -47,20 +47,20 @@ class BalanceSchedulerTest extends BaseTest {
 
         accountRepo.saveAndFlush(account);
 
-        BigDecimal initialBalance = account.getBalance();
+        BigDecimal initialBalance = account.getAvailableBalance();
 
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
 
         BigDecimal expectedBalance = initialBalance.multiply(BigDecimal.ONE.add(interestRate));
-        assertEquals(0, expectedBalance.compareTo(account.getBonusBalance()), "Balances should match ignoring scale. "+
-                "Expected: " + expectedBalance + ". Actual: " + account.getBonusBalance());
+        assertEquals(0, expectedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. "+
+                "Expected: " + expectedBalance + ". Actual: " + account.getAvailableBonusBalance());
 
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
         expectedBalance = expectedBalance.multiply(BigDecimal.ONE.add(interestRate));
-        assertEquals(0, expectedBalance.compareTo(account.getBonusBalance()), "Balances should match ignoring scale. "+
-                "Expected: " + expectedBalance + ". Actual: " + account.getBonusBalance());
+        assertEquals(0, expectedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. "+
+                "Expected: " + expectedBalance + ". Actual: " + account.getAvailableBonusBalance());
 
         BigDecimal almostMaxAllowedInterestRate = maxAllowedInterestRate.subtract(new BigDecimal("0.01"));
         BigDecimal balanceNearLimit = initialBalance.multiply(almostMaxAllowedInterestRate);
@@ -71,13 +71,13 @@ class BalanceSchedulerTest extends BaseTest {
         account = accountRepo.findById(account.getId()).orElseThrow();
 
         BigDecimal maxAllowedBalance = initialBalance.multiply(maxAllowedInterestRate);
-        assertEquals(0, maxAllowedBalance.compareTo(account.getBonusBalance()), "Balances should match ignoring scale. " +
-                "Expected: " + maxAllowedBalance + ". Actual: " + account.getBonusBalance());
+        assertEquals(0, maxAllowedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. " +
+                "Expected: " + maxAllowedBalance + ". Actual: " + account.getAvailableBonusBalance());
 
         balanceScheduler.increaseBalances();
         account = accountRepo.findById(account.getId()).orElseThrow();
-        assertEquals(0, maxAllowedBalance.compareTo(account.getBonusBalance()), "Balances should match ignoring scale. "+
-                "Expected: " + maxAllowedBalance + ". Actual: " + account.getBonusBalance());
+        assertEquals(0, maxAllowedBalance.compareTo(account.getAvailableBonusBalance()), "Balances should match ignoring scale. "+
+                "Expected: " + maxAllowedBalance + ". Actual: " + account.getAvailableBonusBalance());
     }
 
     @Test
@@ -91,8 +91,8 @@ class BalanceSchedulerTest extends BaseTest {
         balanceScheduler.increaseBalances();
         zeroAccount = accountRepo.findById(zeroAccount.getId()).orElseThrow();
 
-        assertEquals(0, BigDecimal.ZERO.setScale(2).compareTo(zeroAccount.getBonusBalance()), "Balance should be 0.00. "+
-                "Expected: " + BigDecimal.ZERO.setScale(2) + ". Actual: " + zeroAccount.getBonusBalance());
+        assertEquals(0, BigDecimal.ZERO.setScale(2).compareTo(zeroAccount.getAvailableBonusBalance()), "Balance should be 0.00. "+
+                "Expected: " + BigDecimal.ZERO.setScale(2) + ". Actual: " + zeroAccount.getAvailableBonusBalance());
     }
 
     @Test
@@ -106,8 +106,8 @@ class BalanceSchedulerTest extends BaseTest {
         balanceScheduler.increaseBalances();
         newAccount = accountRepo.findById(newAccount.getId()).orElseThrow();
 
-        assertEquals(0, BigDecimal.ZERO.compareTo(newAccount.getBonusBalance()), "The balance should remain zero initially. "+
-                "Expected: " + BigDecimal.ZERO.setScale(2) + ". Actual: " + newAccount.getBonusBalance());
+        assertEquals(0, BigDecimal.ZERO.compareTo(newAccount.getAvailableBonusBalance()), "The balance should remain zero initially. "+
+                "Expected: " + BigDecimal.ZERO.setScale(2) + ". Actual: " + newAccount.getAvailableBonusBalance());
 
         BigDecimal depositAmount = new BigDecimal("50");
         newAccount.setBalance(depositAmount);
@@ -120,9 +120,9 @@ class BalanceSchedulerTest extends BaseTest {
 
         BigDecimal expectedBalanceAfterFirstIncrease = depositAmount.multiply(BigDecimal.ONE.add(interestRate));
 
-        assertEquals(0, expectedBalanceAfterFirstIncrease.compareTo(newAccount.getBonusBalance()),
+        assertEquals(0, expectedBalanceAfterFirstIncrease.compareTo(newAccount.getAvailableBonusBalance()),
                 "The balance should have increased again according to the interest rate. "+
-                        "Expected: " + expectedBalanceAfterFirstIncrease + ". Actual: " + newAccount.getBonusBalance());
+                        "Expected: " + expectedBalanceAfterFirstIncrease + ". Actual: " + newAccount.getAvailableBonusBalance());
     }
 
 }
