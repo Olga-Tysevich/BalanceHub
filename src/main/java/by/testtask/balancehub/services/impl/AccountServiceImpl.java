@@ -199,9 +199,6 @@ public class AccountServiceImpl implements AccountService {
 
         Long fromAccountId = moneyTransferReq.getFromAccountId();
         Long currentUserId = currentUser.getId();
-
-        log.info("Creating transfer request from account id: {} by user id: {}", fromAccountId, currentUserId);
-
         Optional<Long> accountOwnerId = accountRepo.findUserIdByAccountId(fromAccountId);
 
         if (accountOwnerId.isEmpty() || !accountOwnerId.get().equals(currentUserId)) {
@@ -210,6 +207,11 @@ public class AccountServiceImpl implements AccountService {
 
             throw new ProhibitedException("The account owner is different from the current user. " +
                     "Owner id: " + ownerId + ", current user id: " + currentUserId);
+        }
+
+        if (moneyTransferReq.getFromAccountId().equals(moneyTransferReq.getToAccountId())) {
+            log.error("It is not possible to transfer to the same account! Account id: {}", fromAccountId);
+            throw new ProhibitedException("It is not possible to transfer to the same account! Account id: " + fromAccountId);
         }
 
         BigDecimal amount = moneyTransferReq.getAmount();
@@ -228,6 +230,8 @@ public class AccountServiceImpl implements AccountService {
             log.error("Recipient account does not exist. Account id: {}", toAccountId);
             throw new ProhibitedException("The specified recipient account does not exist!. Account id: " + toAccountOpt);
         }
+
+        log.info("Creating transfer request from account id: {} by user id: {}", fromAccountId, currentUserId);
 
         Account fromAccount = fromAccountOpt.get();
         Account toAccount = toAccountOpt.get();
