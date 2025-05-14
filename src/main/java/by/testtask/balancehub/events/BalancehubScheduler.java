@@ -20,7 +20,7 @@ public class BalancehubScheduler {
         try {
             accountService.safelyIncreaseBalance();
         } catch (Exception e) {
-            log.error("Exception occured while increasing balance: ", e);
+            log.error("Exception occurred while increasing balance: ", e);
         }
     }
 
@@ -30,7 +30,7 @@ public class BalancehubScheduler {
         try {
             transferService.cancelPendingTransfers();
         } catch (Exception e) {
-            log.error("Exception occured while cancelling transfers: ", e);
+            log.error("Exception occurred while cancelling transfers: ", e);
         }
     }
 

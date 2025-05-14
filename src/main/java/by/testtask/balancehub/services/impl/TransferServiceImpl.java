@@ -242,10 +242,6 @@ public class TransferServiceImpl implements TransferService {
         BigDecimal transferAmount = transfer.getAmount();
         BigDecimal transferBonusAmount = transfer.getBonusAmount();
 
-        transfer.setStatus(TransferStatus.FAILED);
-
-        transferRepo.save(transfer);
-
         Account fromAccount = transfer.getFromAccount();
 
         fromAccount.setBalance(fromAccount.getAvailableBalance().add(transferAmount));
@@ -255,6 +251,10 @@ public class TransferServiceImpl implements TransferService {
         fromAccount.releaseFromBonusHold(transferBonusAmount);
 
         accountRepo.save(fromAccount);
+
+        transfer.setStatus(TransferStatus.FAILED);
+
+        transferRepo.save(transfer);
     }
 
 }
