@@ -55,7 +55,7 @@ class AccountServiceImplTest extends BaseTest {
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
 
         fromAccount.setBalance(new BigDecimal("200.00"));
-        fromAccount.setHold(BigDecimal.ZERO);
+        fromAccount.releaseFromHold(fromAccount.getHold());
 
         Account toAccount = accountRepo.findById(2L).get();
         toAccount.setBalance(BigDecimal.ZERO);
