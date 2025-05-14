@@ -99,7 +99,7 @@ public class AccountServiceImpl implements AccountService {
     public void processSingleAccount(Long accountId) {
         try {
             accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
-                BigDecimal accountBonusBalance = account.getBonusBalance().multiply(account.getBonusHold());
+                BigDecimal accountBonusBalance = account.getBonusBalance().add(account.getBonusHold());
 
                 BigDecimal bonusBalance = accountBonusBalance.compareTo(BigDecimal.ZERO) == 0? account.getInitialBalance() : accountBonusBalance;
                 BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
