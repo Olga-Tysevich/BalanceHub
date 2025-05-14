@@ -101,14 +101,15 @@ public class AccountServiceImpl implements AccountService {
             accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
                 BigDecimal accountBonusBalance = account.getBonusBalance().add(account.getBonusHold());
 
-                BigDecimal bonusBalance = accountBonusBalance.compareTo(BigDecimal.ZERO) == 0? account.getInitialBalance() : accountBonusBalance;
+                BigDecimal bonusBalance = accountBonusBalance.compareTo(BigDecimal.ZERO) == 0?
+                        account.getInitialBalance() : accountBonusBalance;
+
                 BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
                         .orElseThrow();
-
                 BigDecimal maxAllowed = initialBalance.multiply(maxAllowedInterestRate);
                 if (bonusBalance.compareTo(maxAllowed) >= 0) return;
 
-                BigDecimal newBalance = account.getBonusBalance().add(bonusBalance.multiply(BigDecimal.ONE.add(interestRate)));
+                BigDecimal newBalance = bonusBalance.multiply(BigDecimal.ONE.add(interestRate));
                 account.setBonusBalance(newBalance.min(maxAllowed));
                 accountRepo.saveAndFlush(account);
 
