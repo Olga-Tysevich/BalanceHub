@@ -63,7 +63,7 @@ class BalanceSchedulerTest extends BaseTest {
 
         BigDecimal almostMaxAllowedInterestRate = maxAllowedInterestRate.subtract(new BigDecimal("0.01"));
         BigDecimal balanceNearLimit = initialBalance.multiply(almostMaxAllowedInterestRate);
-        account.setBalance(balanceNearLimit);
+        account.setBonusBalance(balanceNearLimit);
         accountRepo.save(account);
 
         balanceScheduler.increaseBalances();
