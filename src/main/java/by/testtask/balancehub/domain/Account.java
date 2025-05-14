@@ -116,4 +116,12 @@ public class Account {
         this.bonusBalance = this.bonusBalance.subtract(amount);
     }
 
+    public BigDecimal getHold() {
+        return new BigDecimal(hold.toPlainString());
+    }
+
+    public BigDecimal getBonusHold() {
+        return new BigDecimal(bonusHold.toPlainString());
+    }
+
 }

@@ -143,7 +143,7 @@ public class AccountServiceImpl implements AccountService {
 
             Account fromAccount = accountRepo.findById(transferDTO.getFromAccountId()).orElseThrow();
 
-            fromAccount.releaseFromHold(fromAccount.getHold().subtract(transferAmount));
+            fromAccount.releaseFromHold(transferAmount);
             accountRepo.save(fromAccount);
 
             transferDTO.setStatus(TransferStatus.COMPLETED);
@@ -179,8 +179,8 @@ public class AccountServiceImpl implements AccountService {
             fromAccount.setBalance(fromAccount.getBalance().add(transferAmount));
             fromAccount.setBonusBalance(fromAccount.getBonusBalance().add(transferBonusAmount));
 
-            fromAccount.releaseFromHold(fromAccount.getHold().subtract(transferAmount));
-            fromAccount.releaseFromBonusHold(fromAccount.getBonusHold().subtract(transferBonusAmount));
+            fromAccount.releaseFromHold(transferAmount);
+            fromAccount.releaseFromBonusHold(transferBonusAmount);
 
             accountRepo.save(fromAccount);
 
@@ -242,19 +242,19 @@ public class AccountServiceImpl implements AccountService {
 
         if (currentBalance.compareTo(transferAmount) >= 0) {
 
-            fromAccount.addToHold(fromAccount.getHold().add(transferAmount));
+            fromAccount.addToHold(transferAmount);
             writtenOffAmount = transferAmount;
 
         } else if (bonusBalance.compareTo(transferAmount) >= 0) {
 
-            fromAccount.addToBonusHold(fromAccount.getBonusHold().add(transferAmount));
+            fromAccount.addToBonusHold(transferAmount);
             writtenOffBonusAmount = transferAmount;
 
         } else if (commonBalance.compareTo(transferAmount) >= 0) {
 
             BigDecimal remainingFromBonus = transferAmount.subtract(currentBalance);
-            fromAccount.addToHold(fromAccount.getHold().add(currentBalance));
-            fromAccount.addToBonusHold(fromAccount.getBonusHold().add(remainingFromBonus));
+            fromAccount.addToHold(currentBalance);
+            fromAccount.addToBonusHold(remainingFromBonus);
             writtenOffAmount = currentBalance;
             writtenOffBonusAmount = remainingFromBonus;
 
