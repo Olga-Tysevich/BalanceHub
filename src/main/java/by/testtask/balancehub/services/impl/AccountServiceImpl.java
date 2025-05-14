@@ -101,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
             accountRepo.findByIdForUpdate(accountId).ifPresent(account -> {
                 BigDecimal accountBonusBalance = account.getBonusBalance().multiply(account.getBonusHold());
 
-                BigDecimal bonusBalance = accountBonusBalance.max(account.getInitialBalance());
+                BigDecimal bonusBalance = accountBonusBalance.compareTo(BigDecimal.ZERO) == 0? account.getInitialBalance() : accountBonusBalance;
                 BigDecimal initialBalance = Optional.ofNullable(account.getInitialBalance())
                         .orElseThrow();
 
