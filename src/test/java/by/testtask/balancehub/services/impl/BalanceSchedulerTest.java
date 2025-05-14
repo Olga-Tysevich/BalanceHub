@@ -43,6 +43,7 @@ class BalanceSchedulerTest extends BaseTest {
         BigDecimal depositAmount = new BigDecimal("1000");
         account.setBalance(depositAmount);
         account.setInitialBalance(depositAmount);
+        account.setBonusBalance(BigDecimal.ZERO);
 
         accountRepo.saveAndFlush(account);
 

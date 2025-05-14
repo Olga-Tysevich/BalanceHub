@@ -54,8 +54,12 @@ class AccountServiceImplTest extends BaseTest {
 
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
 
-        fromAccount.setBalance(new BigDecimal("200.00"));
         fromAccount.releaseFromHold(fromAccount.getHold());
+        fromAccount.releaseFromBonusHold(fromAccount.getBonusHold());
+
+        fromAccount.setInitialBalance(new BigDecimal("200.00"));
+        fromAccount.setBalance(new BigDecimal("200.00"));
+        fromAccount.setBonusBalance(BigDecimal.ZERO);
 
         Account toAccount = accountRepo.findById(2L).get();
         toAccount.setBalance(BigDecimal.ZERO);
@@ -127,6 +131,10 @@ class AccountServiceImplTest extends BaseTest {
         super.setAuthentication(USERNAME_1_EMAIL_LIST.getFirst(), USERNAME_1_PASSWORD);
 
         Account account = accountRepo.findById(1L).get();
+        account.releaseFromHold(account.getHold());
+        account.releaseFromBonusHold(account.getBonusHold());
+
+        account.setBonusBalance(BigDecimal.ZERO);
         account.setBalance(new BigDecimal("5.00"));
         accountRepo.save(account);
 
