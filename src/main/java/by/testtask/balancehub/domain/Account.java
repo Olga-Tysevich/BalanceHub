@@ -91,7 +91,7 @@ public class Account {
         if (this.bonusHold.add(amount).compareTo(this.bonusBalance) > 0) {
             throw new IllegalArgumentException("Insufficient available bonus balance to bonus hold funds.");
         }
-        this.bonusHold = this.bonusBalance.add(amount);
+        this.bonusHold = this.bonusHold.add(amount);
     }
 
     public void releaseFromHold(BigDecimal amount) {
