@@ -84,7 +84,7 @@ public class TransferServiceImplTest extends BaseTest {
         assertThat(fromAccount.getRawBalance())
                 .isEqualTo(new BigDecimal("150.00"));
         assertThat(fromAccount.getHold())
-                .isEqualTo(BigDecimal.ZERO);
+                .isEqualTo(BigDecimal.ZERO.setScale(2));
         assertThat(toAccount.getRawBalance())
                 .isEqualTo(new BigDecimal("50.00"));
 
