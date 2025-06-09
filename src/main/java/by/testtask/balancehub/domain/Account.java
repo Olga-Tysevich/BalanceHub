@@ -109,7 +109,6 @@ public class Account {
             throw new IllegalArgumentException("Cannot release more than is held.");
         }
         this.hold = this.hold.subtract(amount);
-        this.balance = getRawBalance().subtract(amount);
     }
 
     public void releaseFromBonusHold(BigDecimal amount) {
@@ -118,7 +117,6 @@ public class Account {
             throw new IllegalArgumentException("Cannot release more than is held in bonus.");
         }
         this.bonusHold = this.bonusHold.subtract(amount);
-        this.bonusBalance = getRawBonusBalance().subtract(amount);
     }
 
     public BigDecimal getHold() {

@@ -1,5 +1,6 @@
 package by.testtask.balancehub.services;
 
+import by.testtask.balancehub.domain.Account;
 import by.testtask.balancehub.dto.common.UserDTO;
 import by.testtask.balancehub.dto.common.UserSearchType;
 import by.testtask.balancehub.dto.req.UserSearchReq;
@@ -31,4 +32,6 @@ public interface UserService {
     UserDTO findUserById(@NotNull Long id);
 
     Map<UserSearchType, UserPageResp> find(@NotNull UserSearchReq request);
+
+    void evictCacheAndPublishEvent(Account account);
 }
